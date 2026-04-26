@@ -47,7 +47,6 @@
             body { background-color: white; padding: 0; }
             .container-main { box-shadow: none; border: none; width: 100%; max-width: 100%; }
             .tab-content { display: block !important; }
-            .page-break { page-break-before: always; }
         }
 
         .tab-btn {
@@ -67,9 +66,591 @@
             background-color: #eff6ff;
         }
 
-        /* Shared Monitoring Section Styling */
         .monitoring-section {
             margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #f0fdf4;
+            border: 1px solid #dcfce7;
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 container-main">
+        <!-- Header -->
+        <div class="bg-blue-900 text-white p-6 text-center">
+            <h1 class="text-3xl font-bold tracking-tight">Nutrition in NICU</h1>
+            <p class="text-blue-300 mt-1 text-lg">Development by Dr. Ahmed Galal</p>
+        </div>
+
+        <!-- Patient Data Section -->
+        <div class="p-4 bg-gray-50 border-b grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="flex items-center gap-3">
+                <label class="font-bold text-gray-700 whitespace-nowrap">Patient Name:</label>
+                <input type="text" id="patient-name" placeholder="Enter name" class="bg-white">
+            </div>
+            <div class="flex items-center gap-3">
+                <label class="font-bold text-gray-700 whitespace-nowrap">Date:</label>
+                <input type="date" id="report-date" class="bg-white">
+            </div>
+            <div class="flex items-center gap-3">
+                <label class="font-bold text-gray-700 whitespace-nowrap">Patient ID:</label>
+                <input type="text" id="patient-id" placeholder="Enter ID" class="bg-white">
+            </div>
+        </div>
+
+        <!-- Navigation (Tabs) -->
+        <div class="flex border-b no-print bg-gray-100">
+            <button onclick="switchTab('en')" id="tab-en" class="tab-btn active">Enteral Nutrition (EN)</button>
+            <button onclick="switchTab('tpn')" id="tab-tpn" class="tab-btn">Parenteral Nutrition (TPN)</button>
+        </div>
+
+        <div class="p-4 md:p-8">
+            
+            <!-- SECTION 1: Enteral Nutrition -->
+            <div id="section-en" class="tab-content space-y-6">
+                <h2 class="text-2xl font-bold text-purple-800 border-r-4 border-purple-600 pr-3">Enteral Nutrition (EN)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-purple-50 p-6 rounded-xl border border-purple-100">
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Weight (kg)</label>
+                        <input type="number" id="en-weight" value="1.5" step="0.1" oninput="syncWeights(this.value); calculateEN()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Feeding Option</label>
+                        <select id="en-option" onchange="calculateEN()">
+                            <option value="Breast milk">Breast milk</option>
+                            <option value="Term formula">Term formula</option>
+                            <option value="Post discharge formula">Post discharge formula</option>
+                            <option value="Preterm formula">Preterm formula</option>
+                            <option value="High caloric formula">High caloric formula</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Frequency (Every ... hours)</label>
+                        <div class="flex items-center gap-2">
+                            <span>Every</span>
+                            <input type="number" id="en-hours" value="3" oninput="calculateEN()">
+                            <span>Hours</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50 p-6 rounded-xl border border-blue-100">
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Fortification?</label>
+                        <select id="en-fort-choice" onchange="toggleFortifier(); calculateEN()">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                    <div id="fortifier-box" class="hidden space-y-2">
+                        <label class="block text-sm font-bold mb-1">Fortification Instructions</label>
+                        <textarea id="en-fort-instructions" rows="2" placeholder="e.g. Add 1 sachet to 25ml" oninput="calculateEN()"></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-indigo-50 p-6 rounded-xl">
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Initiation (ml/kg/d)</label>
+                        <input type="number" id="en-init-rate" value="20" oninput="calculateEN()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Advancement (ml/kg/d)</label>
+                        <input type="number" id="en-advance" value="20" oninput="calculateEN()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Goal Volume (ml/kg/d)</label>
+                        <input type="number" id="en-goal" value="150" oninput="calculateEN()">
+                    </div>
+                </div>
+
+                <div class="highlight-box space-y-4">
+                    <h3 class="font-bold text-blue-900 border-b pb-2">Feeding Summary</h3>
+                    <div class="text-lg leading-relaxed">
+                        • Start by <span id="res-en-start" class="font-bold text-blue-700">0</span> ml 
+                        Every <span id="res-en-interval" class="font-bold text-blue-700">0</span> Hours.<br>
+                        • Increase by <span id="res-en-inc" class="font-bold text-blue-700">0</span> ml Every Day.<br>
+                        • To max of <span id="res-en-max" class="font-bold text-blue-700">0</span> ml 
+                        Every <span id="res-en-interval-2" class="font-bold text-blue-700">0</span> Hours.<br>
+                        • Using: <span id="res-en-final-option" class="font-bold text-blue-700">-</span>.
+                        <div id="res-en-fort-display" class="mt-2 text-purple-700 font-bold hidden border-t border-blue-200 pt-2">
+                            • Fortification: <span id="res-en-fort-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="monitoring-container-shared-en"></div>
+            </div>
+
+            <!-- SECTION 2: TPN -->
+            <div id="section-tpn" class="hidden space-y-8">
+                <h2 class="text-2xl font-bold text-blue-800 border-r-4 border-blue-600 pr-3">Total Parenteral Nutrition (TPN)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Fluid & Energy Management -->
+                    <div class="bg-gray-50 p-4 rounded-xl border">
+                        <h4 class="font-bold mb-3 text-blue-900">Fluid & Energy Management</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold">Fluid (ml/kg/d)</label>
+                                <input type="number" id="tpn-fluid-kg" value="100" oninput="calculateTPN()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold">Weight (kg)</label>
+                                <input type="number" id="tpn-weight" value="1.5" step="0.1" oninput="syncWeights(this.value); calculateTPN()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold">Enteral Fluid (ml)</label>
+                                <input type="number" id="tpn-enteral-fluid" value="0" oninput="calculateTPN()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold">Formula Caloric Density (kcal/ml)</label>
+                                <input type="number" id="tpn-caloric-density" value="0.67" step="0.01" oninput="calculateTPN()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold">Other Fluid (ml)</label>
+                                <input type="number" id="tpn-other-input" value="0" oninput="calculateTPN()">
+                            </div>
+                            <div class="bg-white p-2 rounded border border-blue-100 flex flex-col justify-center">
+                                <span class="text-[10px] text-blue-600 font-bold uppercase">Enteral Energy</span>
+                                <span id="res-enteral-energy" class="font-bold text-blue-800">0 kcal</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-2">
+                            <div class="p-2 bg-blue-100 rounded text-center text-xs">
+                                TPN Fluid: <span id="res-tpn-remain-fluid" class="font-bold">0</span> ml
+                            </div>
+                            <div class="p-2 bg-purple-100 rounded text-center text-xs">
+                                Total Energy: <span id="res-total-energy-kg" class="font-bold">0</span> kcal/kg
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Glucose Management -->
+                    <div class="bg-gray-50 p-4 rounded-xl border">
+                        <h4 class="font-bold mb-3 text-blue-900">Glucose Management</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold">Set GIR (mg/kg/min)</label>
+                                <input type="number" id="in-gir" value="6" step="0.1" oninput="calculateTPN()">
+                            </div>
+                            <div class="col-span-2 grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="text-xs font-bold">Other Glu Rate</label>
+                                    <input type="number" id="in-glu-other-rate" value="0" oninput="calculateTPN()">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold">Duration (h)</label>
+                                    <input type="number" id="in-glu-other-dur" value="0" oninput="calculateTPN()">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold">Conc (%)</label>
+                                    <input type="number" id="in-glu-other-conc" value="5" oninput="calculateTPN()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-2 bg-yellow-100 rounded text-center text-xs">
+                            Glucose Total Required: <span id="res-glu-total-final" class="font-bold">0</span> g
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto shadow-sm rounded-lg border">
+                    <table class="w-full table-custom">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Intake (/kg)</th>
+                                <th>Total Amt</th>
+                                <th>Volume (ml)</th>
+                                <th>Kcal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold">Protein 10%</td>
+                                <td><input type="number" id="in-prot" value="3" step="0.1" oninput="calculateTPN()"></td>
+                                <td id="res-prot-total">0</td>
+                                <td id="res-prot-vol">0</td>
+                                <td id="res-prot-kcal">0</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold">Lipid 20%</td>
+                                <td><input type="number" id="in-lipid" value="1" step="0.1" oninput="calculateTPN()"></td>
+                                <td id="res-lipid-total">0</td>
+                                <td id="res-lipid-vol">0</td>
+                                <td id="res-lipid-kcal">0</td>
+                            </tr>
+                            <tr class="bg-blue-50">
+                                <td class="font-bold">Glucose</td>
+                                <td class="text-xs">Based on GIR</td>
+                                <td id="res-glu-total-tpn">0</td>
+                                <td id="res-glu-vol-container">
+                                    <span id="res-glu-vol-tpn">0</span>
+                                    <div id="res-glu-mix-breakdown" class="text-[10px] text-blue-600 font-bold block mt-1"></div>
+                                </td>
+                                <td id="res-glu-kcal-tpn">0</td>
+                            </tr>
+                            <tr>
+                                <td class="p-1">
+                                    <select id="sel-nacl-type" onchange="calculateTPN()" class="text-xs font-bold">
+                                        <option value="3">NaCl 3%</option>
+                                        <option value="0.9">NaCl 0.9%</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" id="in-nacl" value="3" oninput="calculateTPN()"></td>
+                                <td id="res-nacl-total">0</td>
+                                <td id="res-nacl-vol">0</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-xs">KCl 15% (mEq)</td>
+                                <td><input type="number" id="in-kcl" value="2" oninput="calculateTPN()"></td>
+                                <td id="res-kcl-total">0</td>
+                                <td id="res-kcl-vol">0</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-xs">Ca Gluconate 10% (mEq)</td>
+                                <td><input type="number" id="in-ca" value="2" oninput="calculateTPN()"></td>
+                                <td id="res-ca-total">0</td>
+                                <td id="res-ca-vol">0</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-xs">Mg 8% (mEq)</td>
+                                <td><input type="number" id="in-mg" value="0.5" oninput="calculateTPN()"></td>
+                                <td id="res-mg-total">0</td>
+                                <td id="res-mg-vol">0</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-xs">Phosphorus (mmol)</td>
+                                <td><input type="number" id="in-phos" value="1" oninput="calculateTPN()"></td>
+                                <td id="res-phos-total">0</td>
+                                <td id="res-phos-vol">0</td>
+                                <td>-</td>
+                            </tr>
+                            <!-- Trace Elements Row -->
+                            <tr class="bg-emerald-50">
+                                <td colspan="2">
+                                    <select id="sel-trace" onchange="calculateTPN()" class="text-xs">
+                                        <option value="Pediatrace">Pediatrace</option>
+                                        <option value="Addaven">Addaven</option>
+                                    </select>
+                                </td>
+                                <td colspan="2"><input type="number" id="in-trace-vol" placeholder="ml" value="0" oninput="calculateTPN()"></td>
+                                <td>-</td>
+                            </tr>
+                            <!-- Vitamins Row -->
+                            <tr class="bg-emerald-50">
+                                <td colspan="2">
+                                    <select id="sel-vitalipid" onchange="calculateTPN()" class="text-xs">
+                                        <option value="Infant">Vitalipid N Infant</option>
+                                        <option value="Adult">Vitalipid N Adult</option>
+                                    </select>
+                                </td>
+                                <td colspan="2"><input type="number" id="in-vitalipid-vol" placeholder="ml" value="0" oninput="calculateTPN()"></td>
+                                <td>-</td>
+                            </tr>
+                            <tr class="bg-emerald-50">
+                                <td colspan="2" class="text-xs font-bold">Soluvito N</td>
+                                <td colspan="2"><input type="number" id="in-soluvito-vol" placeholder="ml" value="0" oninput="calculateTPN()"></td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-gray-100 font-bold">
+                            <tr>
+                                <td colspan="3">TPN Sum</td>
+                                <td id="res-tpn-total-vol">0</td>
+                                <td id="res-tpn-total-kcal">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-indigo-900 text-white p-6 rounded-xl space-y-4">
+                        <h4 class="text-xl font-bold border-b border-indigo-700 pb-2">Analysis</h4>
+                        <div class="flex justify-between items-center">
+                            <span>Glucose Concentration:</span>
+                            <span id="res-glu-conc" class="text-yellow-400 font-bold text-lg">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Osmolarity:</span>
+                            <span id="res-osmolarity" class="text-yellow-400 font-bold text-lg">0 mOsm/L</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-200">
+                        <h4 class="text-xl font-bold text-emerald-900 border-b border-emerald-200 pb-2 mb-4">Glucose Mixing Tool</h4>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-bold">Required Conc (%)</label>
+                                    <input type="number" id="mix-target-conc" placeholder="e.g. 12.5" oninput="runMixing()">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold">Required Volume (ml)</label>
+                                    <input type="number" id="mix-target-vol" placeholder="e.g. 100" oninput="runMixing()">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-bold">Source 1 (%)</label>
+                                    <input type="number" id="mix-c1" value="25" oninput="runMixing()">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold">Source 2 (%)</label>
+                                    <input type="number" id="mix-c2" value="5" oninput="runMixing()">
+                                </div>
+                            </div>
+                            <div id="mix-result" class="mt-4 p-3 bg-emerald-200 rounded-lg text-emerald-900 font-bold text-center">
+                                Results appear here
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="monitoring-container-shared-tpn"></div>
+            </div>
+
+            <!-- Monitoring Content Actual (Moved by JS) -->
+            <div id="section-monitoring-hidden" class="hidden">
+                <div id="monitoring-content-actual">
+                    <h2 class="text-2xl font-bold text-emerald-800 border-r-4 border-emerald-600 pr-3">Monitoring</h2>
+                    <div class="monitoring-section space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-4 bg-white rounded-lg shadow-sm border">
+                                <label class="block font-bold mb-2 text-emerald-900">Lab Values & Monitoring</label>
+                                <textarea id="monitoring-labs" rows="4" placeholder="RBS, Electrolytes, Urea..."></textarea>
+                            </div>
+                            <div class="p-4 bg-white rounded-lg shadow-sm border">
+                                <label class="block font-bold mb-2 text-emerald-900">Clinical Observations</label>
+                                <textarea id="monitoring-clinical" rows="4" placeholder="Weight,residuals..."></textarea>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                            <label class="block font-bold mb-2 text-amber-900">Recommendations & Plan</label>
+                            <textarea id="monitoring-plan" rows="2" placeholder="Next steps..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Print -->
+            <div class="mt-12 flex justify-center no-print">
+                <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-full shadow-2xl flex items-center gap-3 transition-transform hover:scale-105">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Print Detailed Report
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-gray-100 p-4 text-center text-xs text-gray-500 border-t">
+            &copy; 2024 NICU Nutrition Assistant | Dr. Ahmed Galal | Pro Version
+        </div>
+    </div>
+
+    <script>
+        function syncWeights(val) {
+            document.getElementById('en-weight').value = val;
+            document.getElementById('tpn-weight').value = val;
+        }
+
+        function switchTab(tab) {
+            document.getElementById('section-en').classList.toggle('hidden', tab !== 'en');
+            document.getElementById('section-tpn').classList.toggle('hidden', tab !== 'tpn');
+            document.getElementById('tab-en').classList.toggle('active', tab === 'en');
+            document.getElementById('tab-tpn').classList.toggle('active', tab === 'tpn');
+
+            const monitoringContent = document.getElementById('monitoring-content-actual');
+            const enContainer = document.querySelector('.monitoring-container-shared-en');
+            const tpnContainer = document.querySelector('.monitoring-container-shared-tpn');
+
+            if (tab === 'en') {
+                enContainer.appendChild(monitoringContent);
+            } else if (tab === 'tpn') {
+                tpnContainer.appendChild(monitoringContent);
+            }
+        }
+
+        function toggleFortifier() {
+            const isYes = document.getElementById('en-fort-choice').value === 'yes';
+            document.getElementById('fortifier-box').classList.toggle('hidden', !isYes);
+            document.getElementById('res-en-fort-display').classList.toggle('hidden', !isYes);
+        }
+
+        function calculateEN() {
+            const weight = parseFloat(document.getElementById('en-weight').value) || 0;
+            const hours = parseFloat(document.getElementById('en-hours').value) || 1;
+            const initRate = parseFloat(document.getElementById('en-init-rate').value) || 0;
+            const advance = parseFloat(document.getElementById('en-advance').value) || 0;
+            const goal = parseFloat(document.getElementById('en-goal').value) || 0;
+            const feedingOpt = document.getElementById('en-option').value;
+            const fortText = document.getElementById('en-fort-instructions').value;
+
+            const freqPerDay = 24 / hours;
+            const startVal = (initRate * weight) / freqPerDay;
+            const incVal = (advance * weight) / freqPerDay;
+            const maxVal = (goal * weight) / freqPerDay;
+
+            document.getElementById('res-en-start').innerText = startVal.toFixed(1);
+            document.getElementById('res-en-inc').innerText = incVal.toFixed(1);
+            document.getElementById('res-en-max').innerText = maxVal.toFixed(1);
+            document.getElementById('res-en-interval').innerText = hours;
+            document.getElementById('res-en-interval-2').innerText = hours;
+            document.getElementById('res-en-final-option').innerText = feedingOpt;
+            document.getElementById('res-en-fort-text').innerText = fortText || "No specific instructions";
+        }
+
+        function calculateTPN() {
+            const w = parseFloat(document.getElementById('tpn-weight').value) || 0;
+            const fluidTarget = parseFloat(document.getElementById('tpn-fluid-kg').value) * w;
+            const entFluid = parseFloat(document.getElementById('tpn-enteral-fluid').value) || 0;
+            const otherFluid = parseFloat(document.getElementById('tpn-other-input').value) || 0;
+            const tpnFluid = fluidTarget - entFluid - otherFluid;
+            document.getElementById('res-tpn-remain-fluid').innerText = tpnFluid.toFixed(1);
+
+            // Enteral Energy Calculation
+            const caloricDensity = parseFloat(document.getElementById('tpn-caloric-density').value) || 0;
+            const enteralEnergy = entFluid * caloricDensity;
+            document.getElementById('res-enteral-energy').innerText = enteralEnergy.toFixed(1) + " kcal";
+
+            // Protein & Lipid
+            const pIntake = parseFloat(document.getElementById('in-prot').value) || 0;
+            const pG = pIntake * w;
+            const pV = pG * 10;
+            const pK = pG * 4;
+            document.getElementById('res-prot-total').innerText = pG.toFixed(1);
+            document.getElementById('res-prot-vol').innerText = pV.toFixed(1);
+            document.getElementById('res-prot-kcal').innerText = pK.toFixed(0);
+
+            const lIntake = parseFloat(document.getElementById('in-lipid').value) || 0;
+            const lG = lIntake * w;
+            const lV = lG * 5;
+            const lK = lG * 10;
+            document.getElementById('res-lipid-total').innerText = lG.toFixed(1);
+            document.getElementById('res-lipid-vol').innerText = lV.toFixed(1);
+            document.getElementById('res-lipid-kcal').innerText = lK.toFixed(0);
+
+            // NaCl
+            const naclType = document.getElementById('sel-nacl-type').value;
+            const naIntake = parseFloat(document.getElementById('in-nacl').value) || 0;
+            const naTotal = naIntake * w;
+            let naVol = 0;
+            if (naclType === "3") { naVol = naTotal / 0.513; }
+            else { naVol = naTotal / 0.154; }
+            document.getElementById('res-nacl-total').innerText = naTotal.toFixed(1);
+            document.getElementById('res-nacl-vol').innerText = naVol.toFixed(1);
+
+            // Other electrolytes
+            const kIntake = parseFloat(document.getElementById('in-kcl').value) || 0;
+            const kTotal = kIntake * w;
+            const kVol = kTotal / 2;
+            document.getElementById('res-kcl-total').innerText = kTotal.toFixed(1);
+            document.getElementById('res-kcl-vol').innerText = kVol.toFixed(1);
+
+            const caIntake = parseFloat(document.getElementById('in-ca').value) || 0;
+            const caTotal = caIntake * w;
+            const caVol = caTotal / 0.23; 
+            document.getElementById('res-ca-total').innerText = caTotal.toFixed(1);
+            document.getElementById('res-ca-vol').innerText = caVol.toFixed(1);
+
+            const mgIntake = parseFloat(document.getElementById('in-mg').value) || 0;
+            const mgTotal = mgIntake * w;
+            const mgVol = mgTotal / 0.812; 
+            document.getElementById('res-mg-total').innerText = mgTotal.toFixed(1);
+            document.getElementById('res-mg-vol').innerText = mgVol.toFixed(1);
+
+            const phosIntake = parseFloat(document.getElementById('in-phos').value) || 0;
+            const phosTotal = phosIntake * w;
+            const phosVol = phosTotal;
+            document.getElementById('res-phos-total').innerText = phosTotal.toFixed(1);
+            document.getElementById('res-phos-vol').innerText = phosVol.toFixed(1);
+
+            // Micro-nutrients
+            const traceVol = parseFloat(document.getElementById('in-trace-vol').value) || 0;
+            const vitaVol = parseFloat(document.getElementById('in-vitalipid-vol').value) || 0;
+            const soluVol = parseFloat(document.getElementById('in-soluvito-vol').value) || 0;
+
+            // Glucose
+            const gir = parseFloat(document.getElementById('in-gir').value) || 0;
+            const reqG = (gir * w * 1440) / 1000;
+            
+            const otherG_rate = parseFloat(document.getElementById('in-glu-other-rate').value) || 0;
+            const otherG_dur = parseFloat(document.getElementById('in-glu-other-dur').value) || 0;
+            const otherG_conc = parseFloat(document.getElementById('in-glu-other-conc').value) || 0;
+            const otherG_gram = (otherG_rate * otherG_dur * otherG_conc) / 100;
+            
+            const tpnG_gram = reqG - otherG_gram;
+            const tpnG_vol = tpnFluid - (pV + lV + naVol + kVol + caVol + mgVol + phosVol + traceVol + vitaVol + soluVol);
+            const tpnG_kcal = tpnG_gram * 3.4;
+
+            document.getElementById('res-glu-total-final').innerText = reqG.toFixed(1);
+            document.getElementById('res-glu-total-tpn').innerText = tpnG_gram.toFixed(1);
+            document.getElementById('res-glu-vol-tpn').innerText = tpnG_vol.toFixed(1);
+            document.getElementById('res-glu-kcal-tpn').innerText = tpnG_kcal.toFixed(0);
+
+            const gluConc = (tpnG_gram / tpnG_vol) * 100;
+            document.getElementById('res-glu-conc').innerText = isFinite(gluConc) ? gluConc.toFixed(1) + "%" : "0%";
+
+            const parenteralEnergy = pK + lK + tpnG_kcal;
+            document.getElementById('res-tpn-total-vol').innerText = tpnFluid.toFixed(1);
+            document.getElementById('res-tpn-total-kcal').innerText = parenteralEnergy.toFixed(0);
+
+            const totalEnergyPerDay = parenteralEnergy + enteralEnergy;
+            const totalEnergyPerKg = w > 0 ? (totalEnergyPerDay / w) : 0;
+            document.getElementById('res-total-energy-kg').innerText = totalEnergyPerKg.toFixed(1);
+
+            const totalElectro = naTotal + kTotal + caTotal + mgTotal;
+            const osm = (pG * 10 + tpnG_gram * 5 + totalElectro * 2) / (tpnFluid / 1000);
+            document.getElementById('res-osmolarity').innerText = isFinite(osm) ? Math.round(osm) + " mOsm/L" : "0 mOsm/L";
+            
+            // Re-run mixing sync if tool is active
+            runMixing();
+        }
+
+        function runMixing() {
+            const targetC = parseFloat(document.getElementById('mix-target-conc').value);
+            const targetV = parseFloat(document.getElementById('mix-target-vol').value);
+            const c1 = parseFloat(document.getElementById('mix-c1').value);
+            const c2 = parseFloat(document.getElementById('mix-c2').value);
+
+            const breakdownDisplay = document.getElementById('res-glu-mix-breakdown');
+
+            if (targetC && targetV && c1 && c2) {
+                const v1 = (targetV * (targetC - c2)) / (c1 - c2);
+                const v2 = targetV - v1;
+                
+                if (v1 < 0 || v2 < 0) {
+                    document.getElementById('mix-result').innerText = "Invalid (Out of range)";
+                    breakdownDisplay.innerText = "";
+                } else {
+                    const resultText = `D${c1}%: ${v1.toFixed(1)}ml | D${c2}%: ${v2.toFixed(1)}ml`;
+                    document.getElementById('mix-result').innerHTML = resultText.replace('|', '<br>');
+                    // Sync to TPN table beside glucose volume
+                    breakdownDisplay.innerText = `(${resultText})`;
+                }
+            } else {
+                breakdownDisplay.innerText = "";
+            }
+        }
+
+        window.onload = () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('report-date').value = today;
+            switchTab('en');
+            calculateEN();
+            calculateTPN();
+        }
+    </script>
+</body>
+</html>
+
+```
             padding: 1.5rem;
             background-color: #f0fdf4;
             border: 1px solid #dcfce7;
