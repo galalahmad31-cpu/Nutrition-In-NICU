@@ -51,10 +51,13 @@
         }
 
         .tab-btn {
-            padding: 12px 24px;
+            padding: 12px 10px;
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+            font-size: 0.9rem;
         }
 
         .tab-btn.active {
@@ -62,6 +65,15 @@
             color: #2563eb;
             font-weight: bold;
             background-color: #eff6ff;
+        }
+
+        /* Shared Monitoring Section Styling */
+        .monitoring-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #f0fdf4;
+            border: 1px solid #dcfce7;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
@@ -74,10 +86,22 @@
             <p class="text-blue-300 mt-1 text-lg">Development by Dr. Ahmed Galal</p>
         </div>
 
-        <!-- Navigation -->
-        <div class="flex border-b no-print bg-gray-50">
-            <button onclick="switchTab('en')" id="tab-en" class="tab-btn active w-1/2">Enteral Nutrition (EN)</button>
-            <button onclick="switchTab('tpn')" id="tab-tpn" class="tab-btn w-1/2">Total Parenteral Nutrition (TPN)</button>
+        <!-- Patient Data Section -->
+        <div class="p-4 bg-gray-50 border-b grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-center gap-3">
+                <label class="font-bold text-gray-700 whitespace-nowrap">Patient Name:</label>
+                <input type="text" id="patient-name" placeholder="Enter patient name" class="bg-white">
+            </div>
+            <div class="flex items-center gap-3">
+                <label class="font-bold text-gray-700 whitespace-nowrap">Patient ID:</label>
+                <input type="text" id="patient-id" placeholder="Enter ID number" class="bg-white">
+            </div>
+        </div>
+
+        <!-- Navigation (Tabs) - Removed third path button -->
+        <div class="flex border-b no-print bg-gray-100">
+            <button onclick="switchTab('en')" id="tab-en" class="tab-btn active">Enteral Nutrition (EN)</button>
+            <button onclick="switchTab('tpn')" id="tab-tpn" class="tab-btn">Parenteral Nutrition (TPN)</button>
         </div>
 
         <div class="p-4 md:p-8">
@@ -158,13 +182,15 @@
                         <textarea id="en-instructions" rows="3" placeholder="Write any specific instructions here..."></textarea>
                     </div>
                 </div>
+
+                <!-- Monitoring included at the bottom of EN -->
+                <div class="monitoring-container-shared-en"></div>
             </div>
 
             <!-- SECTION 2: TPN -->
             <div id="section-tpn" class="hidden space-y-8">
                 <h2 class="text-2xl font-bold text-blue-800 border-r-4 border-blue-600 pr-3">Total Parenteral Nutrition (TPN)</h2>
                 
-                <!-- Fluid & Energy Params -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-gray-50 p-4 rounded-xl border">
                         <h4 class="font-bold mb-3 text-blue-900">Fluid Management</h4>
@@ -217,7 +243,6 @@
                     </div>
                 </div>
 
-                <!-- TPN Main Table -->
                 <div class="overflow-x-auto shadow-sm rounded-lg border">
                     <table class="w-full table-custom">
                         <thead>
@@ -290,7 +315,6 @@
                     </table>
                 </div>
 
-                <!-- Stats & Mixing -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-indigo-900 text-white p-6 rounded-xl space-y-4">
                         <h4 class="text-xl font-bold border-b border-indigo-700 pb-2">Analysis</h4>
@@ -304,7 +328,6 @@
                         </div>
                     </div>
 
-                    <!-- Mixing Tool -->
                     <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-200">
                         <h4 class="text-xl font-bold text-emerald-900 border-b border-emerald-200 pb-2 mb-4">Glucose Mixing Tool</h4>
                         <div class="space-y-3">
@@ -334,6 +357,32 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Monitoring included at the bottom of TPN -->
+                <div class="monitoring-container-shared-tpn"></div>
+            </div>
+
+            <!-- Monitoring Content Container (Hidden from main view, moved by JS) -->
+            <div id="section-monitoring-hidden" class="hidden">
+                <div id="monitoring-content-actual">
+                    <h2 class="text-2xl font-bold text-emerald-800 border-r-4 border-emerald-600 pr-3">Monitoring</h2>
+                    <div class="monitoring-section space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-4 bg-white rounded-lg shadow-sm border">
+                                <label class="block font-bold mb-2 text-emerald-900">Lab Values & Monitoring</label>
+                                <textarea id="monitoring-labs" rows="6" placeholder="RBS, Electrolytes, Urea, Creatinine, etc..."></textarea>
+                            </div>
+                            <div class="p-4 bg-white rounded-lg shadow-sm border">
+                                <label class="block font-bold mb-2 text-emerald-900">Clinical Observations</label>
+                                <textarea id="monitoring-clinical" rows="6" placeholder="Daily weight, intake/output, gastric residuals, etc..."></textarea>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                            <label class="block font-bold mb-2 text-amber-900">Recommendations & Plan</label>
+                            <textarea id="monitoring-plan" rows="3" placeholder="Adjustments for tomorrow, weaning plan..."></textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Print Button -->
@@ -355,8 +404,20 @@
         function switchTab(tab) {
             document.getElementById('section-en').classList.toggle('hidden', tab !== 'en');
             document.getElementById('section-tpn').classList.toggle('hidden', tab !== 'tpn');
+            
             document.getElementById('tab-en').classList.toggle('active', tab === 'en');
             document.getElementById('tab-tpn').classList.toggle('active', tab === 'tpn');
+
+            // Move monitoring content to the active section
+            const monitoringContent = document.getElementById('monitoring-content-actual');
+            const enContainer = document.querySelector('.monitoring-container-shared-en');
+            const tpnContainer = document.querySelector('.monitoring-container-shared-tpn');
+
+            if (tab === 'en') {
+                enContainer.appendChild(monitoringContent);
+            } else if (tab === 'tpn') {
+                tpnContainer.appendChild(monitoringContent);
+            }
         }
 
         function toggleFortifier() {
@@ -394,7 +455,6 @@
             const tpnFluid = fluidTotal - entFluid - otherFluid;
             document.getElementById('res-tpn-remain-fluid').innerText = tpnFluid.toFixed(1);
 
-            // 1. Protein (10% -> 1g = 10ml)
             const pIntake = parseFloat(document.getElementById('in-prot').value) || 0;
             const pG = pIntake * w;
             const pV = pG * 10;
@@ -403,45 +463,41 @@
             document.getElementById('res-prot-vol').innerText = pV.toFixed(1);
             document.getElementById('res-prot-kcal').innerText = pK.toFixed(0);
 
-            // 2. Lipid (20% -> 1g = 5ml)
             const lIntake = parseFloat(document.getElementById('in-lipid').value) || 0;
             const lG = lIntake * w;
             const lV = lG * 5;
-            const lK = lG * 10; // 9-10 kcal
+            const lK = lG * 10;
             document.getElementById('res-lipid-total').innerText = lG.toFixed(1);
             document.getElementById('res-lipid-vol').innerText = lV.toFixed(1);
             document.getElementById('res-lipid-kcal').innerText = lK.toFixed(0);
 
-            // 3. Electrolytes
             const naIntake = parseFloat(document.getElementById('in-nacl').value) || 0;
             const naTotal = naIntake * w;
-            const naVol = naTotal / 0.513; // NaCl 3% ~ 0.513 mEq/ml
+            const naVol = naTotal / 0.513; 
             document.getElementById('res-nacl-total').innerText = naTotal.toFixed(1);
             document.getElementById('res-nacl-vol').innerText = naVol.toFixed(1);
 
             const kIntake = parseFloat(document.getElementById('in-kcl').value) || 0;
             const kTotal = kIntake * w;
-            const kVol = kTotal / 2; // KCl 15% ~ 2mEq/ml
+            const kVol = kTotal / 2;
             document.getElementById('res-kcl-total').innerText = kTotal.toFixed(1);
             document.getElementById('res-kcl-vol').innerText = kVol.toFixed(1);
 
             const caIntake = parseFloat(document.getElementById('in-ca').value) || 0;
             const caTotal = caIntake * w;
-            const caVol = caTotal / 0.45; // Ca Gluconate 10% ~ 0.45 mEq/ml
+            const caVol = caTotal / 0.45;
             document.getElementById('res-ca-total').innerText = caTotal.toFixed(1);
             document.getElementById('res-ca-vol').innerText = caVol.toFixed(1);
 
             const mgIntake = parseFloat(document.getElementById('in-mg').value) || 0;
             const mgTotal = mgIntake * w;
-            const mgVol = mgTotal / 0.8; // Mg 10% approx
+            const mgVol = mgTotal / 0.8;
             document.getElementById('res-mg-total').innerText = mgTotal.toFixed(1);
             document.getElementById('res-mg-vol').innerText = mgVol.toFixed(1);
 
-            // 4. Glucose Calculation (Based on GIR)
             const gir = parseFloat(document.getElementById('in-gir').value) || 0;
             const totalG_required = (gir * w * 1440) / 1000;
             
-            // Deduct Other Glucose
             const otherG_rate = parseFloat(document.getElementById('in-glu-other-rate').value) || 0;
             const otherG_dur = parseFloat(document.getElementById('in-glu-other-dur').value) || 0;
             const otherG_conc = parseFloat(document.getElementById('in-glu-other-conc').value) || 0;
@@ -460,12 +516,9 @@
             const gluConc = (tpn_G_gram / tpn_G_vol) * 100;
             document.getElementById('res-glu-conc').innerText = gluConc.toFixed(1) + "%";
 
-            // 5. Total Sums
             document.getElementById('res-tpn-total-vol').innerText = tpnFluid.toFixed(1);
             document.getElementById('res-tpn-total-kcal').innerText = (pK + lK + tpn_G_kcal).toFixed(0);
 
-            // 6. Osmolarity Calculation: 
-            // Formula: (Prot g*10 + Glu g*5 + Electrolytes mEq*2) / Volume Liter
             const totalElectro = naTotal + kTotal + caTotal + mgTotal;
             const osm = (pG * 10 + tpn_G_gram * 5 + totalElectro * 2) / (tpnFluid / 1000);
             document.getElementById('res-osmolarity').innerText = Math.round(osm) + " mOsm/L";
@@ -478,8 +531,6 @@
             const c2 = parseFloat(document.getElementById('mix-c2').value);
 
             if (targetC && targetV && c1 && c2) {
-                // Algebra: V1*C1 + (V_total - V1)*C2 = V_total * C_target
-                // V1(C1 - C2) = V_total(C_target - C2)
                 const v1 = (targetV * (targetC - c2)) / (c1 - c2);
                 const v2 = targetV - v1;
 
@@ -493,6 +544,8 @@
         }
 
         window.onload = () => {
+            // Initial positioning of monitoring content inside EN tab
+            switchTab('en');
             calculateEN();
             calculateTPN();
         }
@@ -501,4 +554,3 @@
 </html>
 
 ```
-
