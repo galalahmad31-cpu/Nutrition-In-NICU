@@ -47,8 +47,12 @@
             .no-print { display: none !important; }
             body { background-color: white; padding: 0; }
             .container-main { box-shadow: none; border: none; width: 100%; max-width: 100%; }
-            .tab-content.hidden { display: none !important; }
-            .tab-content:not(.hidden) { display: block !important; }
+            
+            /* Logic for printing specific sections based on content */
+            .tab-content { display: none !important; }
+            body.print-en #section-en { display: block !important; }
+            body.print-tpn #section-tpn { display: block !important; }
+            
             #patient-header-section { display: block !important; margin-bottom: 20px; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; }
             input { border: none !important; background: transparent !important; outline: none !important; }
             .component-select { appearance: none; -webkit-appearance: none; background: transparent; }
@@ -95,6 +99,13 @@
         .ltr-input {
             direction: ltr !important;
             text-align: left !important;
+        }
+
+        /* Specifically for the weight inputs to ensure LTR and decimal support */
+        .weight-input-ltr {
+            direction: ltr !important;
+            text-align: left !important;
+            unicode-bidi: bidi-override;
         }
     </style>
 </head>
@@ -153,7 +164,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-purple-50 p-6 rounded-xl border border-purple-100 no-print">
                     <div>
                         <label class="block text-sm font-bold mb-1">Weight (kg)</label>
-                        <input type="number" id="en-weight" value="1.5" step="0.1" oninput="syncWeights(this.value); calculateEN()">
+                        <!-- Changed to type="text" with inputmode="decimal" to fix decimal point issues in LTR/RTL mix -->
+                        <input type="text" id="en-weight" inputmode="decimal" placeholder="Enter Weight (e.g. 1.5)" class="weight-input-ltr" oninput="syncWeights(this.value); calculateEN()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold mb-1">Feeding Option</label>
@@ -208,10 +220,10 @@
                     <div class="flex justify-between items-center no-print border-b border-blue-200 pb-2 mb-2">
                         <h3 class="font-bold text-blue-900">Feeding Summary</h3>
                         <div class="flex gap-2">
-                            <button onclick="shareContent('en')" class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 font-bold flex items-center gap-1">
+                            <button onclick="smartShare()" class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 font-bold flex items-center gap-1">
                                 SHARE
                             </button>
-                            <button onclick="window.print()" class="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-800 font-bold flex items-center gap-1">
+                            <button onclick="smartPrint()" class="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-800 font-bold flex items-center gap-1">
                                 PRINT
                             </button>
                         </div>
@@ -246,7 +258,8 @@
                             </div>
                             <div>
                                 <label class="text-xs font-bold">Weight (kg)</label>
-                                <input type="number" id="tpn-weight" value="1.5" step="0.1" oninput="syncWeights(this.value); calculateTPN()">
+                                <!-- Changed to type="text" with inputmode="decimal" -->
+                                <input type="text" id="tpn-weight" inputmode="decimal" placeholder="Enter Weight" class="weight-input-ltr" oninput="syncWeights(this.value); calculateTPN()">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-blue-700">Target Energy (kcal/kg/d)</label>
@@ -308,8 +321,8 @@
 
                 <div class="relative">
                     <div class="flex justify-end gap-2 mb-2 no-print">
-                        <button onclick="shareContent('tpn')" class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 font-bold flex items-center gap-1">SHARE TPN</button>
-                        <button onclick="window.print()" class="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-800 font-bold flex items-center gap-1">PRINT TABLE</button>
+                        <button onclick="smartShare()" class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 font-bold flex items-center gap-1">SHARE TPN</button>
+                        <button onclick="smartPrint()" class="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-800 font-bold flex items-center gap-1">PRINT TABLE</button>
                     </div>
                     <div class="overflow-x-auto shadow-sm rounded-lg border">
                         <table class="w-full table-custom">
@@ -448,7 +461,6 @@
                             <span>Osmolarity:</span>
                             <span id="res-osmolarity" class="text-yellow-400 font-bold text-lg">0 mOsm/L</span>
                         </div>
-                        <!-- المخفي بناء على الطلب -->
                         <div class="hidden flex justify-between items-center border-t border-indigo-700 pt-2">
                             <span>Calculated Total Energy:</span>
                             <span class="text-yellow-400 font-bold text-lg"><span id="res-total-energy-kg">0</span> kcal/kg</span>
@@ -513,8 +525,8 @@
 
             <!-- Footer -->
             <div class="mt-12 flex flex-col md:flex-row justify-center gap-4 no-print border-t pt-8">
-                <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-full shadow-xl transition-all">PRINT REPORT</button>
-                <button onclick="shareContent('all')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-12 rounded-full shadow-xl transition-all">SHARE REPORT</button>
+                <button onclick="smartPrint()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-full shadow-xl transition-all">PRINT REPORT</button>
+                <button onclick="smartShare()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-12 rounded-full shadow-xl transition-all">SHARE REPORT</button>
             </div>
         </div>
         <div class="bg-gray-100 p-4 text-center text-xs text-gray-500 border-t">
@@ -524,6 +536,7 @@
 
     <script>
         function syncWeights(val) {
+            // Logic to keep both weights synced while allowing decimal point typing
             document.getElementById('en-weight').value = val;
             document.getElementById('tpn-weight').value = val;
             calculateEN();
@@ -547,7 +560,8 @@
         }
 
         function calculateEN() {
-            const w = parseFloat(document.getElementById('en-weight').value) || 0;
+            const wStr = document.getElementById('en-weight').value;
+            const w = parseFloat(wStr) || 0;
             const h = parseFloat(document.getElementById('en-hours').value) || 1;
             const init = parseFloat(document.getElementById('en-init-rate').value) || 0;
             const adv = parseFloat(document.getElementById('en-advance').value) || 0;
@@ -563,7 +577,8 @@
         }
 
         function calculateTPN() {
-            const w = parseFloat(document.getElementById('tpn-weight').value) || 0;
+            const wStr = document.getElementById('tpn-weight').value;
+            const w = parseFloat(wStr) || 0;
             const fluidTarget = (parseFloat(document.getElementById('tpn-fluid-kg').value) || 0) * w;
             const entFluid = parseFloat(document.getElementById('tpn-enteral-fluid').value) || 0;
             const otherFluid = parseFloat(document.getElementById('tpn-other-input').value) || 0;
@@ -588,7 +603,6 @@
             document.getElementById('res-lipid-vol').innerText = lV.toFixed(1);
             document.getElementById('res-lipid-kcal').innerText = (lG * 10).toFixed(0);
 
-            // تعديل الصوديوم: خصم 2 ميك لكل 1 مليمول فسفور
             const phosTotal = (parseFloat(document.getElementById('in-phos').value) || 0) * w;
             const naIntakeRaw = (parseFloat(document.getElementById('in-nacl').value) || 0) * w;
             const naAdjusted = Math.max(0, naIntakeRaw - (2 * phosTotal));
@@ -644,19 +658,54 @@
             runMixing();
         }
 
-        async function shareContent(type) {
+        function smartPrint() {
+            const hasEN = (parseFloat(document.getElementById('en-weight').value) || 0) > 0;
+            const hasTPN = (parseFloat(document.getElementById('tpn-weight').value) || 0) > 0;
+            
+            if (!hasEN && !hasTPN) {
+                alert("Please enter a weight in EN or TPN sections to print.");
+                return;
+            }
+
+            document.body.classList.remove('print-en', 'print-tpn');
+            if (hasEN) document.body.classList.add('print-en');
+            if (hasTPN) document.body.classList.add('print-tpn');
+            
+            window.print();
+        }
+
+        async function smartShare() {
             const name = document.getElementById('patient-name').value || "N/A";
-            const w = document.getElementById('en-weight').value;
-            let text = `NICU Nutrition Report\n👤 Patient: ${name}\n⚖️ Weight: ${w} kg\n--------------------------\n\n`;
-            if (type === 'en' || type === 'all') {
-                text += `--- EN ---\n• Dose: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n• Feed: ${document.getElementById('res-en-final-option').innerText}\n\n`;
+            const w_en = parseFloat(document.getElementById('en-weight').value) || 0;
+            const w_tpn = parseFloat(document.getElementById('tpn-weight').value) || 0;
+            
+            if (w_en <= 0 && w_tpn <= 0) {
+                alert("No data found to share. Please add weight to EN or TPN.");
+                return;
             }
-            if (type === 'tpn' || type === 'all') {
-                text += `--- TPN ---\n• GIR: ${document.getElementById('in-gir').value}\n• TPN Vol: ${document.getElementById('res-tpn-total-vol').innerText} ml\n• Energy: ${document.getElementById('res-total-energy-kg').innerText} kcal/kg\n\n`;
+
+            let text = `NICU Nutrition Report\n👤 Patient: ${name}\n--------------------------\n\n`;
+            
+            if (w_en > 0) {
+                text += `--- ENTERAL NUTRITION (EN) ---\n⚖️ Weight: ${w_en} kg\n• Dose: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n• Max: ${document.getElementById('res-en-max').innerText} ml\n• Feed: ${document.getElementById('res-en-final-option').innerText}\n`;
+                if (document.getElementById('en-fort-choice').value === 'yes') {
+                    text += `• Fortifier: ${document.getElementById('res-en-fort-text').innerText}\n`;
+                }
+                text += `\n`;
             }
-            text += `--------------------------\nGenerated by Nutrition In NICU app\nDeveloped by Dr.Ahmed Galal\nNutrition Support Pharmacist`;
-            if (navigator.share) await navigator.share({ text: text });
-            else { copyToClipboard(text); alert("Copied to clipboard!"); }
+            
+            if (w_tpn > 0) {
+                text += `--- PARENTERAL NUTRITION (TPN) ---\n⚖️ Weight: ${w_tpn} kg\n• GIR: ${document.getElementById('in-gir').value} mg/kg/min\n• Total Volume: ${document.getElementById('res-tpn-total-vol').innerText} ml\n• Total Energy: ${document.getElementById('res-total-energy-kg').innerText} kcal/kg\n• Osmolarity: ${document.getElementById('res-osmolarity').innerText}\n• Glucose Conc: ${document.getElementById('res-glu-conc').innerText}\n`;
+            }
+            
+            text += `\n--------------------------\nGenerated by Nutrition In NICU app\nDeveloped by Dr. Ahmed Galal\nNutrition Support Pharmacist`;
+            
+            if (navigator.share) {
+                await navigator.share({ text: text });
+            } else {
+                copyToClipboard(text);
+                alert("Report copied to clipboard!");
+            }
         }
 
         function copyToClipboard(text) {
@@ -682,12 +731,9 @@
         window.onload = () => {
             document.getElementById('report-date').value = new Date().toISOString().split('T')[0];
             switchTab('en');
-            calculateEN();
-            calculateTPN();
         }
     </script>
 </body>
 </html>
 
 ```
-
