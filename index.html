@@ -164,7 +164,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-purple-50 p-6 rounded-xl border border-purple-100 no-print">
                     <div>
                         <label class="block text-sm font-bold mb-1">Weight (kg)</label>
-                        <!-- Changed to type="text" with inputmode="decimal" to fix decimal point issues in LTR/RTL mix -->
                         <input type="text" id="en-weight" inputmode="decimal" placeholder="Enter Weight (e.g. 1.5)" class="weight-input-ltr" oninput="syncWeights(this.value); calculateEN()">
                     </div>
                     <div>
@@ -258,7 +257,6 @@
                             </div>
                             <div>
                                 <label class="text-xs font-bold">Weight (kg)</label>
-                                <!-- Changed to type="text" with inputmode="decimal" -->
                                 <input type="text" id="tpn-weight" inputmode="decimal" placeholder="Enter Weight" class="weight-input-ltr" oninput="syncWeights(this.value); calculateTPN()">
                             </div>
                             <div>
@@ -536,7 +534,6 @@
 
     <script>
         function syncWeights(val) {
-            // Logic to keep both weights synced while allowing decimal point typing
             document.getElementById('en-weight').value = val;
             document.getElementById('tpn-weight').value = val;
             calculateEN();
@@ -676,32 +673,83 @@
 
         async function smartShare() {
             const name = document.getElementById('patient-name').value || "N/A";
-            const w_en = parseFloat(document.getElementById('en-weight').value) || 0;
-            const w_tpn = parseFloat(document.getElementById('tpn-weight').value) || 0;
+            const date = document.getElementById('report-date').value || "N/A";
+            const id = document.getElementById('patient-id').value || "N/A";
+            const dr = document.getElementById('physician-name').value || "N/A";
+            const ph = document.getElementById('pharmacist-name').value || "N/A";
+
+            const w_en_val = document.getElementById('en-weight').value;
+            const w_tpn_val = document.getElementById('tpn-weight').value;
+            const w_en = parseFloat(w_en_val) || 0;
+            const w_tpn = parseFloat(w_tpn_val) || 0;
             
             if (w_en <= 0 && w_tpn <= 0) {
                 alert("No data found to share. Please add weight to EN or TPN.");
                 return;
             }
 
-            let text = `NICU Nutrition Report\n👤 Patient: ${name}\n--------------------------\n\n`;
+            let text = `🏥 NICU Nutrition Report\n`;
+            text += `--------------------------\n`;
+            text += `👤 Patient: ${name}\n`;
+            text += `📅 Date: ${date} | ID: ${id}\n`;
+            text += `👨‍⚕️ Dr: ${dr} | 💊 Ph: ${ph}\n`;
+            text += `--------------------------\n\n`;
             
+            // Enteral Nutrition Section
             if (w_en > 0) {
-                text += `--- ENTERAL NUTRITION (EN) ---\n⚖️ Weight: ${w_en} kg\n• Dose: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n• Max: ${document.getElementById('res-en-max').innerText} ml\n• Feed: ${document.getElementById('res-en-final-option').innerText}\n`;
+                text += `🟣 ENTERAL NUTRITION (EN)\n`;
+                text += `⚖️ Weight: ${w_en} kg\n`;
+                text += `• Start: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n`;
+                text += `• Increase: ${document.getElementById('res-en-inc').innerText} ml/day\n`;
+                text += `• Max Goal: ${document.getElementById('res-en-max').innerText} ml every ${document.getElementById('res-en-interval-2').innerText}h\n`;
+                text += `• Option: ${document.getElementById('res-en-final-option').innerText}\n`;
                 if (document.getElementById('en-fort-choice').value === 'yes') {
                     text += `• Fortifier: ${document.getElementById('res-en-fort-text').innerText}\n`;
                 }
                 text += `\n`;
             }
             
+            // Parenteral Nutrition Section
             if (w_tpn > 0) {
-                text += `--- PARENTERAL NUTRITION (TPN) ---\n⚖️ Weight: ${w_tpn} kg\n• GIR: ${document.getElementById('in-gir').value} mg/kg/min\n• Total Volume: ${document.getElementById('res-tpn-total-vol').innerText} ml\n• Total Energy: ${document.getElementById('res-total-energy-kg').innerText} kcal/kg\n• Osmolarity: ${document.getElementById('res-osmolarity').innerText}\n• Glucose Conc: ${document.getElementById('res-glu-conc').innerText}\n`;
+                text += `🔵 PARENTERAL NUTRITION (TPN)\n`;
+                text += `⚖️ Weight: ${w_tpn} kg\n`;
+                text += `• GIR: ${document.getElementById('in-gir').value} mg/kg/min\n`;
+                text += `• Total Fluid: ${document.getElementById('res-tpn-total-vol').innerText} ml\n`;
+                text += `• TPN Energy: ${document.getElementById('res-tpn-total-kcal').innerText} kcal\n`;
+                text += `• Total Energy (EN+TPN): ${document.getElementById('res-total-energy-kg').innerText} kcal/kg\n`;
+                text += `• Osmolarity: ${document.getElementById('res-osmolarity').innerText}\n`;
+                text += `• Glu Conc: ${document.getElementById('res-glu-conc').innerText}\n`;
+                text += `--- TPN Ingredients ---\n`;
+                text += `• Protein: ${document.getElementById('in-prot').value} g/kg (${document.getElementById('res-prot-vol').innerText} ml)\n`;
+                text += `• Lipid: ${document.getElementById('in-lipid').value} g/kg (${document.getElementById('res-lipid-vol').innerText} ml)\n`;
+                text += `• Electrolytes: Na ${document.getElementById('in-nacl').value}, K ${document.getElementById('in-kcl').value}, Ca ${document.getElementById('in-ca').value}, Mg ${document.getElementById('in-mg').value}\n`;
+                text += `\n`;
+            }
+
+            // Monitoring Section
+            const labs = document.getElementById('monitoring-labs').value;
+            const clinical = document.getElementById('monitoring-clinical').value;
+            const plan = document.getElementById('monitoring-plan').value;
+
+            if (labs || clinical || plan) {
+                text += `🟢 MONITORING & PLAN\n`;
+                if (labs) text += `• Labs: ${labs}\n`;
+                if (clinical) text += `• Clinical: ${clinical}\n`;
+                if (plan) text += `• Plan: ${plan}\n`;
+                text += `\n`;
             }
             
-            text += `\n--------------------------\nGenerated by Nutrition In NICU app\nDeveloped by Dr. Ahmed Galal\nNutrition Support Pharmacist`;
+            text += `--------------------------\n`;
+            text += `Developed by Dr. Ahmed Galal\n`;
+            text += `Nutrition Support Pharmacist`;
             
             if (navigator.share) {
-                await navigator.share({ text: text });
+                try {
+                    await navigator.share({ text: text });
+                } catch (err) {
+                    copyToClipboard(text);
+                    alert("Report copied to clipboard!");
+                }
             } else {
                 copyToClipboard(text);
                 alert("Report copied to clipboard!");
@@ -709,7 +757,12 @@
         }
 
         function copyToClipboard(text) {
-            const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            const el = document.createElement('textarea'); 
+            el.value = text; 
+            document.body.appendChild(el); 
+            el.select(); 
+            document.execCommand('copy'); 
+            document.body.removeChild(el);
         }
 
         function runMixing() {
