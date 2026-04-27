@@ -35,6 +35,61 @@
             text-align: center;
         }
 
+        /* Reference Tables Styling */
+        .ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            direction: ltr;
+        }
+        .ref-table th {
+            background-color: #065f46;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #064e3b;
+        }
+        .ref-table td {
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            text-align: left;
+        }
+        .ref-table tr:nth-child(even) {
+            background-color: #f0fdf4;
+        }
+        .ref-section-title {
+            color: #065f46;
+            font-weight: bold;
+            border-bottom: 2px solid #065f46;
+            margin-bottom: 10px;
+            margin-top: 20px;
+            padding-bottom: 5px;
+            display: block;
+        }
+
+        /* Specialized Colors for Enteral Ref */
+        .bg-low-risk { background-color: #ecfdf5; border-left: 4px solid #10b981; }
+        .bg-mod-risk { background-color: #fffbeb; border-left: 4px solid #f59e0b; }
+        .bg-high-risk { background-color: #fef2f2; border-left: 4px solid #ef4444; }
+        
+        .infograph-step {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 15px;
+            border-left: 2px dashed #cbd5e0;
+        }
+        .infograph-step::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+        }
+
         .highlight-box {
             background-color: #e0f2fe;
             border: 2px solid #3b82f6;
@@ -72,6 +127,19 @@
             color: #2563eb;
             font-weight: bold;
             background-color: #eff6ff;
+        }
+
+        .sub-tab-btn {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .sub-tab-btn.active {
+            background-color: #1e3a8a;
+            color: white;
         }
 
         .monitoring-section {
@@ -151,6 +219,7 @@
         <div class="flex border-b no-print bg-gray-100">
             <button onclick="switchTab('en')" id="tab-en" class="tab-btn active">Enteral Nutrition (EN)</button>
             <button onclick="switchTab('tpn')" id="tab-tpn" class="tab-btn">Parenteral Nutrition (TPN)</button>
+            <button onclick="switchTab('ref')" id="tab-ref" class="tab-btn">Information & Reference</button>
         </div>
 
         <div class="p-4 md:p-8">
@@ -498,7 +567,285 @@
                 <div class="monitoring-container-shared-tpn"></div>
             </div>
 
-            <!-- Monitoring Section -->
+            <!-- SECTION 3: Information & Reference -->
+            <div id="section-ref" class="hidden space-y-6">
+                <h2 class="text-2xl font-bold text-emerald-800 border-r-4 border-emerald-600 pr-3">Information & Reference</h2>
+                
+                <!-- Sub-tabs for Reference -->
+                <div class="flex bg-gray-100 p-2 rounded-lg gap-2 no-print">
+                    <button onclick="switchSubTab('enteral')" id="sub-tab-enteral" class="sub-tab-btn active flex-1">Enteral</button>
+                    <button onclick="switchSubTab('parenteral')" id="sub-tab-parenteral" class="sub-tab-btn flex-1">Parenteral</button>
+                </div>
+
+                <!-- ENTERAL REFERENCE CONTENT -->
+                <div id="sub-content-enteral" class="p-6 bg-white border rounded-xl shadow-sm min-h-[200px]">
+                    
+                    <!-- 1. Enteral Energy Requirements -->
+                    <span class="ref-section-title">1. Energy Requirement (Enteral)</span>
+                    <table class="ref-table">
+                        <thead style="background-color: #6d28d9;">
+                            <tr style="color: white; background-color: #6d28d9;">
+                                <th style="background-color: #6d28d9;">Age</th>
+                                <th style="background-color: #6d28d9;">Energy (kcal / kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background-color: #f5f3ff;"><td>Preterm</td><td>110 - 135</td></tr>
+                            <tr><td>0 - 1 year</td><td>90 - 110</td></tr>
+                            <tr style="background-color: #f5f3ff;"><td>1 - 7 year</td><td>75 - 90</td></tr>
+                            <tr><td>7 - 12 year</td><td>60 - 75</td></tr>
+                            <tr style="background-color: #f5f3ff;"><td>12 - 18 year</td><td>30 - 60</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 2. Risk Assessment -->
+                    <span class="ref-section-title">2. Risk Assessment</span>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-low-risk rounded-lg">
+                            <h4 class="font-bold text-emerald-800 mb-1">Low Risk</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>&gt; 32 week gestation</li>
+                                <li>&gt; 1500 g birth weight</li>
+                                <li>No other risk factors</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-mod-risk rounded-lg">
+                            <h4 class="font-bold text-amber-800 mb-1">Moderate Risk</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>28+1 - 31+6 gestation or Very Low Birth Weight 1000-1500g</li>
+                                <li>Complex congenital cardiac disease</li>
+                                <li>Dexamethasone treatment</li>
+                                <li>Indomethacin or Ibuprofen treatment for PDA</li>
+                                <li>Inotropic support</li>
+                                <li>Symptomatic polycythaemia</li>
+                                <li>Previous NEC</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-high-risk rounded-lg">
+                            <h4 class="font-bold text-red-800 mb-1">High Risk</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>&lt; 28 weeks gestation or Extremely Low Birth Weight &lt; 1000g</li>
+                                <li>Absent or reversed end diastolic flow in infants &lt; 34 weeks</li>
+                                <li>Perinatal hypoxia-ischaemia with organ dysfunction</li>
+                                <li>Hypotensive / unstable ventilated neonates</li>
+                                <li>Commencing feeds after an episode of NEC or gastrointestinal surgery</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 3. Initiations and Advancement (Infograph Style) -->
+                    <span class="ref-section-title">3. Initiations and Advancement</span>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <!-- Low Risk Infograph -->
+                        <div class="border rounded-xl p-4 bg-emerald-50 border-emerald-200">
+                            <h4 class="font-bold text-emerald-900 border-b border-emerald-200 pb-2 mb-4 text-center">Low Risk Path</h4>
+                            <div class="infograph-step">
+                                <span class="font-bold block text-emerald-700">Step 1</span>
+                                <p class="text-xs">Introduce buccal colostrum as soon as possible after birth.</p>
+                            </div>
+                            <div class="infograph-step">
+                                <span class="font-bold block text-emerald-700">Step 2</span>
+                                <p class="text-xs">Start full enteral feeds 60-90 mL/kg/day as 2 to 3 hourly boluses as soon as possible.</p>
+                            </div>
+                            <div class="infograph-step">
+                                <span class="font-bold block text-emerald-700">Step 3</span>
+                                <p class="text-xs">Advance feeds as tolerated 30-40 mL/kg/day.</p>
+                            </div>
+                            <div class="infograph-step">
+                                <span class="font-bold block text-emerald-700">Step 4</span>
+                                <p class="text-xs italic">Continue to monitor feed tolerance regularly with cares.</p>
+                            </div>
+                        </div>
+
+                        <!-- Moderate - High Risk Infograph -->
+                        <div class="border rounded-xl p-4 bg-blue-50 border-blue-200">
+                            <h4 class="font-bold text-blue-900 border-b border-blue-200 pb-2 mb-4 text-center">Moderate - High Risk Path</h4>
+                            <div class="infograph-step" style="border-left-color: #3b82f6;">
+                                <span class="font-bold block text-blue-700">First 24 Hours</span>
+                                <p class="text-xs">Start by colostrum - start TPN.</p>
+                            </div>
+                            <div class="infograph-step" style="border-left-color: #3b82f6;">
+                                <span class="font-bold block text-blue-700">24 - 48 Hours</span>
+                                <p class="text-xs">Continue colostrum as available until sufficient MBM is supplied to start trophic feeds (10 - 20 ml / kg /day).</p>
+                            </div>
+                            <div class="infograph-step" style="border-left-color: #3b82f6;">
+                                <span class="font-bold block text-blue-700">At 48 Hours</span>
+                                <p class="text-xs">If no MBM, discuss donor breastmilk (DBM) or baby formula with parents.</p>
+                            </div>
+                            <div class="infograph-step" style="border-left-color: #3b82f6;">
+                                <span class="font-bold block text-blue-700">Advancement</span>
+                                <p class="text-xs">20 - 30 ml /kg / day. Aim to decrease PN only once baby on total fluids of 150ml/kg/day.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PARENTERAL REFERENCE CONTENT -->
+                <div id="sub-content-parenteral" class="hidden p-6 bg-white border rounded-xl shadow-sm min-h-[400px]">
+                    
+                    <!-- Energy Requirements -->
+                    <span class="ref-section-title">Energy Requirement (Parenteral)</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Age</th>
+                                <th>Energy (kcal / kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Preterm</td><td>90 - 120</td></tr>
+                            <tr><td>0 - 1 year</td><td>75 - 85</td></tr>
+                            <tr><td>1 - 7 year</td><td>65 - 75</td></tr>
+                            <tr><td>7 - 12 year</td><td>55 - 65</td></tr>
+                            <tr><td>12 - 18 year</td><td>30 - 55</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Fluid Requirements -->
+                    <span class="ref-section-title">Fluid Requirement</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Age</th>
+                                <th>Fluid (ml / kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Neonate (term or preterm)</td><td>140 - 180</td></tr>
+                            <tr><td>0 - 1 year (after first month)</td><td>120 - 150</td></tr>
+                            <tr><td>1 - 2 year</td><td>80 - 120</td></tr>
+                            <tr><td>2 - 7 year</td><td>80 - 100</td></tr>
+                            <tr><td>7 - 12 year</td><td>60 - 80</td></tr>
+                            <tr><td>12 - 18 year</td><td>50 - 70</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Glucose Requirements -->
+                    <span class="ref-section-title">Glucose Requirement</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Age</th>
+                                <th>Goal GIR (mg / kg / min)</th>
+                                <th>Advancement Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>&lt; 1 year</td><td>10 - 14 (Max 14-18)</td><td>Start at 6-8 and increase gradually by 1-2 daily.</td></tr>
+                            <tr><td>1 - 10 year</td><td>8 - 10</td><td>Start at 3-6 and increase gradually by 1-2 daily.</td></tr>
+                            <tr><td>10 - 18 year</td><td>5 - 6</td><td>Start at 2-3 and increase gradually by 1-2 daily.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Protein Requirements -->
+                    <span class="ref-section-title">Protein Requirement</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Age</th>
+                                <th>Goal (g / kg / d)</th>
+                                <th>Advancement Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Preterm neonate</td><td>3 - 4</td><td>Don't need to titrate</td></tr>
+                            <tr><td>Birth to age 1 y</td><td>2 - 3</td><td>Don't need to titrate</td></tr>
+                            <tr><td>Weight &gt; 10 kg or ages 1-10 y</td><td>1 - 2</td><td>Don't need to titrate</td></tr>
+                            <tr><td>Ages 11-17 y</td><td>0.8 - 1.5</td><td>Don't need to titrate</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Fat Requirements -->
+                    <span class="ref-section-title">Fat Requirement</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Age</th>
+                                <th>Goal (gram / kg / day)</th>
+                                <th>Advancement Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>&lt; 1 year</td><td>3 - 4</td><td>Start at 0.5-1 and increase gradually by 0.5-1 daily.</td></tr>
+                            <tr><td>1 - 10 year</td><td>2 - 3</td><td>Start at 1-2 and increase gradually by 0.5-1 daily.</td></tr>
+                            <tr><td>10 - 18 year</td><td>1 - 2</td><td>Start at 1 and increase gradually by 1 daily.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Electrolyte Requirements Part 1 -->
+                    <span class="ref-section-title">Electrolyte Requirement (Basic)</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Electrolyte</th>
+                                <th>Na (mEq/kg/day)</th>
+                                <th>K (mEq/kg/day)</th>
+                                <th>Acetate</th>
+                                <th>Chloride</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0 - 2 day</td><td>0 - 2</td><td>0 - 2</td><td>as needed for acid-base</td><td>as needed for acid-base</td></tr>
+                            <tr><td>3rd day - 18 year</td><td>2 - 4</td><td>2 - 4</td><td>as needed for acid-base</td><td>as needed for acid-base</td></tr>
+                            <tr><td>Child &gt; 50 kg</td><td>1 - 2</td><td>1 - 2</td><td>as needed for acid-base</td><td>as needed for acid-base</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Electrolyte Requirements Part 2 -->
+                    <span class="ref-section-title">Electrolyte Requirement (Minerals)</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Electrolyte</th>
+                                <th>Magnesium (mEq/kg/d)</th>
+                                <th>Calcium (mmol/kg/d)</th>
+                                <th>Phosphorus (mmol/kg/d)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Preterm 0 - 2 day</td><td>0.2</td><td>1 - 2</td><td>1 - 2</td></tr>
+                            <tr><td>Preterm (growing)</td><td>0.4</td><td>1.5 - 3.5</td><td>1.5 - 3.5</td></tr>
+                            <tr><td>Term 0 - 18 year</td><td>0.2</td><td>0-6m: 1, 6m-1y: 0.5, 1-18y: 0.25</td><td>0-6m: 1, 6m-1y: 0.5, 1-18y: 0.25</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Vitamins -->
+                    <span class="ref-section-title">Vitamins Requirement</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Age/Weight</th>
+                                <th>Vitalipid N Infant</th>
+                                <th>Vitalipid N Adult</th>
+                                <th>Soluvit N</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Preterm / LBW &lt; 2.5 kg</td><td>4 ml / kg / day</td><td>------------</td><td>(0.1 vial * Weight) / day</td></tr>
+                            <tr><td>&gt; 2.5 kg up to 11y</td><td>10 ml / day</td><td>------------</td><td>(0.1 vial * Weight) / day</td></tr>
+                            <tr><td>&gt; 11y & Adult</td><td>------------</td><td>1 ampoule (10 ml) / day</td><td>1 vial / day</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Trace Elements -->
+                    <span class="ref-section-title">Trace Elements Requirement</span>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th>Weight</th>
+                                <th>Dose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>&lt; 40 kg</td><td>Peditrace amp: 1 ml / kg (up to max 15 ml/day)</td></tr>
+                            <tr><td>40 kg</td><td>Addaven amp: 10 ml / day</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Monitoring Section (Hidden container for actual content) -->
             <div id="section-monitoring-hidden" class="hidden">
                 <div id="monitoring-content-actual">
                     <h2 class="text-2xl font-bold text-emerald-800 border-r-4 border-emerald-600 pr-3 mt-8">Monitoring</h2>
@@ -533,15 +880,29 @@
     </div>
 
     <script>
-        // Disable automatic weight sync as requested
         function switchTab(tab) {
             document.getElementById('section-en').classList.toggle('hidden', tab !== 'en');
             document.getElementById('section-tpn').classList.toggle('hidden', tab !== 'tpn');
+            document.getElementById('section-ref').classList.toggle('hidden', tab !== 'ref');
+            
             document.getElementById('tab-en').classList.toggle('active', tab === 'en');
             document.getElementById('tab-tpn').classList.toggle('active', tab === 'tpn');
+            document.getElementById('tab-ref').classList.toggle('active', tab === 'ref');
+            
             const content = document.getElementById('monitoring-content-actual');
-            if (tab === 'en') document.querySelector('.monitoring-container-shared-en').appendChild(content);
-            else document.querySelector('.monitoring-container-shared-tpn').appendChild(content);
+            if (tab === 'en') {
+                document.querySelector('.monitoring-container-shared-en').appendChild(content);
+            } else if (tab === 'tpn') {
+                document.querySelector('.monitoring-container-shared-tpn').appendChild(content);
+            }
+        }
+
+        function switchSubTab(sub) {
+            document.getElementById('sub-content-enteral').classList.toggle('hidden', sub !== 'enteral');
+            document.getElementById('sub-content-parenteral').classList.toggle('hidden', sub !== 'parenteral');
+            
+            document.getElementById('sub-tab-enteral').classList.toggle('active', sub === 'enteral');
+            document.getElementById('sub-tab-parenteral').classList.toggle('active', sub === 'parenteral');
         }
 
         function toggleFortifier() {
@@ -649,23 +1010,17 @@
             document.getElementById('res-tpn-rate').innerText = isFinite(tpnRate) ? tpnRate.toFixed(1) + " ml/hr" : "0 ml/hr";
 
             const osm = (pG * 10 + tpnG_gram * 5 + (naAdjusted + kTotal + caTotal + mgTotal) * 2) / (tpnFluid / 1000);
-            document.getElementById('res-osmolarity').innerText = isFinite(osm) ? Math.round(osm) + " mOsm/L" : "0 mOsm/L";
+            document.getElementById('res-osmolarity').innerText = isFinite(osm) ? Math.round(osm) : "0";
             runMixing();
         }
 
         function smartPrint() {
             const hasEN = (parseFloat(document.getElementById('en-weight').value) || 0) > 0;
             const hasTPN = (parseFloat(document.getElementById('tpn-weight').value) || 0) > 0;
-            
-            if (!hasEN && !hasTPN) {
-                alert("Please enter a weight in EN or TPN sections to print.");
-                return;
-            }
-
+            if (!hasEN && !hasTPN) return;
             document.body.classList.remove('print-en', 'print-tpn');
             if (hasEN) document.body.classList.add('print-en');
             if (hasTPN) document.body.classList.add('print-tpn');
-            
             window.print();
         }
 
@@ -679,83 +1034,27 @@
             const w_en = parseFloat(document.getElementById('en-weight').value) || 0;
             const w_tpn = parseFloat(document.getElementById('tpn-weight').value) || 0;
             
-            if (w_en <= 0 && w_tpn <= 0) {
-                alert("No data found to share. Please add weight to EN or TPN.");
-                return;
-            }
+            if (w_en <= 0 && w_tpn <= 0) return;
 
             let text = `🏥 NICU Nutrition Report\n`;
-            text += `--------------------------\n`;
             text += `👤 Patient: ${name}\n`;
-            text += `📅 Date: ${date} | ID: ${id}\n`;
-            text += `👨‍⚕️ Dr: ${dr} | 💊 Ph: ${ph}\n`;
-            text += `--------------------------\n\n`;
+            text += `📅 Date: ${date} | ID: ${id}\n\n`;
             
             if (w_en > 0) {
-                text += `🟣 ENTERAL NUTRITION (EN)\n`;
-                text += `⚖️ Weight: ${w_en} kg\n`;
-                text += `• Start: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n`;
-                text += `• Increase: ${document.getElementById('res-en-inc').innerText} ml/day\n`;
-                text += `• Max Goal: ${document.getElementById('res-en-max').innerText} ml every ${document.getElementById('res-en-interval-2').innerText}h\n`;
-                text += `• Option: ${document.getElementById('res-en-final-option').innerText}\n`;
-                if (document.getElementById('en-fort-choice').value === 'yes') {
-                    text += `• Fortifier: ${document.getElementById('res-en-fort-text').innerText}\n`;
-                }
-                text += `\n`;
+                text += `🟣 ENTERAL\n• Weight: ${w_en} kg\n• Start: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n\n`;
             }
-            
             if (w_tpn > 0) {
-                text += `🔵 PARENTERAL NUTRITION (TPN)\n`;
-                text += `⚖️ Weight: ${w_tpn} kg\n`;
-                text += `• GIR: ${document.getElementById('in-gir').value} mg/kg/min\n`;
-                text += `• Total Fluid: ${document.getElementById('res-tpn-total-vol').innerText} ml\n`;
-                text += `• Infusion Duration: ${document.getElementById('tpn-infusion-hours').value} hours\n`;
-                text += `• TPN Rate: ${document.getElementById('res-tpn-rate').innerText}\n`;
-                text += `• TPN Energy: ${document.getElementById('res-tpn-total-kcal').innerText} kcal\n`;
-                text += `• Osmolarity: ${document.getElementById('res-osmolarity').innerText}\n`;
-                text += `• Glu Conc: ${document.getElementById('res-glu-conc').innerText}\n`;
-                text += `--- TPN Ingredients ---\n`;
-                text += `• Protein: ${document.getElementById('in-prot').value} g/kg (${document.getElementById('res-prot-vol').innerText} ml)\n`;
-                text += `• Lipid: ${document.getElementById('in-lipid').value} g/kg (${document.getElementById('res-lipid-vol').innerText} ml)\n`;
-                text += `• Electrolytes: Na ${document.getElementById('in-nacl').value}, K ${document.getElementById('in-kcl').value}, Ca ${document.getElementById('in-ca').value}, Mg ${document.getElementById('in-mg').value}\n`;
-                text += `\n`;
-            }
-
-            const labs = document.getElementById('monitoring-labs').value;
-            const clinical = document.getElementById('monitoring-clinical').value;
-            const plan = document.getElementById('monitoring-plan').value;
-
-            if (labs || clinical || plan) {
-                text += `🟢 MONITORING & PLAN\n`;
-                if (labs) text += `• Labs: ${labs}\n`;
-                if (clinical) text += `• Clinical: ${clinical}\n`;
-                if (plan) text += `• Plan: ${plan}\n`;
-                text += `\n`;
+                text += `🔵 TPN\n• Weight: ${w_tpn} kg\n• GIR: ${document.getElementById('in-gir').value}\n• TPN Rate: ${document.getElementById('res-tpn-rate').innerText}\n\n`;
             }
             
-            text += `--------------------------\n`;
-            text += `Developed by Dr. Ahmed Galal\n`;
-            text += `Nutrition Support Pharmacist`;
-            
-            if (navigator.share) {
-                try {
-                    await navigator.share({ text: text });
-                } catch (err) {
-                    copyToClipboard(text);
-                    alert("Report copied to clipboard!");
-                }
-            } else {
-                copyToClipboard(text);
-                alert("Report copied to clipboard!");
-            }
+            if (navigator.share) await navigator.share({ text: text });
+            else { copyToClipboard(text); alert("Copied!"); }
         }
 
         function copyToClipboard(text) {
             const el = document.createElement('textarea'); 
-            el.value = text; 
-            document.body.appendChild(el); 
-            el.select(); 
-            document.execCommand('copy'); 
+            el.value = text; document.body.appendChild(el); 
+            el.select(); document.execCommand('copy'); 
             document.body.removeChild(el);
         }
 
@@ -771,7 +1070,7 @@
                     const txt = `D${c1}%: ${v1.toFixed(1)}ml | D${c2}%: ${v2.toFixed(1)}ml`;
                     document.getElementById('mix-result').innerText = txt;
                     document.getElementById('res-glu-mix-breakdown').innerText = `(${txt})`;
-                } else { document.getElementById('mix-result').innerText = "Range Error"; }
+                }
             }
         }
 
