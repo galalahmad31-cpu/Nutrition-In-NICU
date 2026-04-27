@@ -110,7 +110,7 @@
             body.print-tpn #section-tpn { display: block !important; }
             
             #patient-header-section { display: block !important; margin-bottom: 20px; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; }
-            input { border: none !important; background: transparent !important; outline: none !important; }
+            input, textarea { border: none !important; background: transparent !important; outline: none !important; }
             .component-select { appearance: none; -webkit-appearance: none; background: transparent; }
         }
 
@@ -229,6 +229,30 @@
                     <input type="text" id="patient-id" placeholder="ID" class="bg-white ltr-input">
                 </div>
             </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 patient-info-row">
+                <div class="flex items-center gap-3">
+                    <label class="font-bold text-gray-700 whitespace-nowrap">Gestational Age:</label>
+                    <input type="text" id="gestational-age" placeholder="e.g. 32 weeks" class="bg-white ltr-input">
+                </div>
+                <div class="flex items-center gap-3">
+                    <label class="font-bold text-gray-700 whitespace-nowrap">Birth Weight (kg):</label>
+                    <input type="text" id="birth-weight" placeholder="e.g. 1.5" class="bg-white ltr-input">
+                </div>
+            </div>
+
+            <!-- Added Diagnosis Rows -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 patient-info-row">
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-gray-700">Clinical Diagnosis:</label>
+                    <textarea id="clinical-diagnosis" rows="2" placeholder="Enter clinical diagnosis" class="bg-white ltr-input text-left"></textarea>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-gray-700">Nutritional Diagnosis:</label>
+                    <textarea id="nutritional-diagnosis" rows="2" placeholder="Enter nutritional diagnosis" class="bg-white ltr-input text-left"></textarea>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 patient-info-row">
                 <div class="flex items-center gap-3">
                     <label class="font-bold text-gray-700 whitespace-nowrap">Physician:</label>
@@ -961,26 +985,20 @@
             document.getElementById('sub-tab-parenteral').classList.toggle('active', sub === 'parenteral');
         }
 
-        // EN Nested Tab Logic
         function switchEnNested(id) {
             const contents = document.querySelectorAll('.en-nested-content');
             contents.forEach(el => el.classList.add('hidden'));
-            
             const btns = document.querySelectorAll('#sub-content-enteral .nested-tab-btn');
             btns.forEach(btn => btn.classList.remove('active'));
-            
             document.getElementById('en-nested-' + id).classList.remove('hidden');
             document.getElementById('en-btn-' + id).classList.add('active');
         }
 
-        // PN Nested Tab Logic
         function switchPnNested(id) {
             const contents = document.querySelectorAll('.pn-nested-content');
             contents.forEach(el => el.classList.add('hidden'));
-            
             const btns = document.querySelectorAll('#sub-content-parenteral .nested-tab-btn');
             btns.forEach(btn => btn.classList.remove('active'));
-            
             document.getElementById('pn-nested-' + id).classList.remove('hidden');
             document.getElementById('pn-btn-' + id).classList.add('active');
         }
@@ -1108,6 +1126,10 @@
             const name = document.getElementById('patient-name').value || "N/A";
             const date = document.getElementById('report-date').value || "N/A";
             const id = document.getElementById('patient-id').value || "N/A";
+            const ga = document.getElementById('gestational-age').value || "N/A";
+            const bw = document.getElementById('birth-weight').value || "N/A";
+            const cDiag = document.getElementById('clinical-diagnosis').value || "N/A";
+            const nDiag = document.getElementById('nutritional-diagnosis').value || "N/A";
             const dr = document.getElementById('physician-name').value || "N/A";
             const ph = document.getElementById('pharmacist-name').value || "N/A";
 
@@ -1118,7 +1140,10 @@
 
             let text = `🏥 NICU Nutrition Report\n`;
             text += `👤 Patient: ${name}\n`;
-            text += `📅 Date: ${date} | ID: ${id}\n\n`;
+            text += `📅 Date: ${date} | ID: ${id}\n`;
+            text += `👶 GA: ${ga} | Birth Wt: ${bw} kg\n`;
+            text += `📝 Clinical Diag: ${cDiag}\n`;
+            text += `🍎 Nutrition Diag: ${nDiag}\n\n`;
             
             if (w_en > 0) {
                 text += `🟣 ENTERAL\n• Weight: ${w_en} kg\n• Start: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n\n`;
