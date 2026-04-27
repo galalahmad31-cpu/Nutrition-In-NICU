@@ -48,7 +48,6 @@
             body { background-color: white; padding: 0; }
             .container-main { box-shadow: none; border: none; width: 100%; max-width: 100%; }
             
-            /* Logic for printing specific sections based on content */
             .tab-content { display: none !important; }
             body.print-en #section-en { display: block !important; }
             body.print-tpn #section-tpn { display: block !important; }
@@ -101,7 +100,6 @@
             text-align: left !important;
         }
 
-        /* Specifically for the weight inputs to ensure LTR and decimal support */
         .weight-input-ltr {
             direction: ltr !important;
             text-align: left !important;
@@ -163,8 +161,8 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-purple-50 p-6 rounded-xl border border-purple-100 no-print">
                     <div>
-                        <label class="block text-sm font-bold mb-1">Weight (kg)</label>
-                        <input type="text" id="en-weight" inputmode="decimal" placeholder="Enter Weight (e.g. 1.5)" class="weight-input-ltr" oninput="syncWeights(this.value); calculateEN()">
+                        <label class="block text-sm font-bold mb-1">Weight (kg) - EN</label>
+                        <input type="text" id="en-weight" inputmode="decimal" placeholder="Enter Weight" class="weight-input-ltr" oninput="calculateEN()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold mb-1">Feeding Option</label>
@@ -256,8 +254,8 @@
                                 <input type="number" id="tpn-fluid-kg" value="100" oninput="calculateTPN()">
                             </div>
                             <div>
-                                <label class="text-xs font-bold">Weight (kg)</label>
-                                <input type="text" id="tpn-weight" inputmode="decimal" placeholder="Enter Weight" class="weight-input-ltr" oninput="syncWeights(this.value); calculateTPN()">
+                                <label class="text-xs font-bold">Weight (kg) - TPN</label>
+                                <input type="text" id="tpn-weight" inputmode="decimal" placeholder="Enter Weight" class="weight-input-ltr" oninput="calculateTPN()">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-blue-700">Target Energy (kcal/kg/d)</label>
@@ -438,9 +436,15 @@
                             </tbody>
                             <tfoot class="bg-gray-100 font-bold">
                                 <tr>
-                                    <td colspan="3">TPN Sum</td>
+                                    <td colspan="3">TPN Volume Sum</td>
                                     <td id="res-tpn-total-vol">0</td>
                                     <td id="res-tpn-total-kcal">0</td>
+                                </tr>
+                                <tr class="bg-blue-100 text-blue-900">
+                                    <td colspan="2">Infusion Duration (Hours)</td>
+                                    <td><input type="number" id="tpn-infusion-hours" value="24" oninput="calculateTPN()" class="bg-white border-blue-300 font-bold"></td>
+                                    <td class="text-sm">TPN Rate:</td>
+                                    <td id="res-tpn-rate" class="text-lg">0 ml/hr</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -458,10 +462,6 @@
                         <div class="flex justify-between items-center">
                             <span>Osmolarity:</span>
                             <span id="res-osmolarity" class="text-yellow-400 font-bold text-lg">0 mOsm/L</span>
-                        </div>
-                        <div class="hidden flex justify-between items-center border-t border-indigo-700 pt-2">
-                            <span>Calculated Total Energy:</span>
-                            <span class="text-yellow-400 font-bold text-lg"><span id="res-total-energy-kg">0</span> kcal/kg</span>
                         </div>
                     </div>
 
@@ -533,13 +533,7 @@
     </div>
 
     <script>
-        function syncWeights(val) {
-            document.getElementById('en-weight').value = val;
-            document.getElementById('tpn-weight').value = val;
-            calculateEN();
-            calculateTPN();
-        }
-
+        // Disable automatic weight sync as requested
         function switchTab(tab) {
             document.getElementById('section-en').classList.toggle('hidden', tab !== 'en');
             document.getElementById('section-tpn').classList.toggle('hidden', tab !== 'tpn');
@@ -563,6 +557,7 @@
             const init = parseFloat(document.getElementById('en-init-rate').value) || 0;
             const adv = parseFloat(document.getElementById('en-advance').value) || 0;
             const goal = parseFloat(document.getElementById('en-goal').value) || 0;
+            
             const freq = 24 / h;
             document.getElementById('res-en-start').innerText = ((init * w) / freq).toFixed(1);
             document.getElementById('res-en-inc').innerText = ((adv * w) / freq).toFixed(1);
@@ -648,7 +643,10 @@
             const tpnEnergy = (pG * 4) + (lG * 10) + (tpnG_gram * 3.4);
             document.getElementById('res-tpn-total-vol').innerText = tpnFluid.toFixed(1);
             document.getElementById('res-tpn-total-kcal').innerText = tpnEnergy.toFixed(0);
-            document.getElementById('res-total-energy-kg').innerText = (w > 0 ? (tpnEnergy + enteralEnergyTotal) / w : 0).toFixed(1);
+
+            const infusionHours = parseFloat(document.getElementById('tpn-infusion-hours').value) || 24;
+            const tpnRate = tpnFluid / infusionHours;
+            document.getElementById('res-tpn-rate').innerText = isFinite(tpnRate) ? tpnRate.toFixed(1) + " ml/hr" : "0 ml/hr";
 
             const osm = (pG * 10 + tpnG_gram * 5 + (naAdjusted + kTotal + caTotal + mgTotal) * 2) / (tpnFluid / 1000);
             document.getElementById('res-osmolarity').innerText = isFinite(osm) ? Math.round(osm) + " mOsm/L" : "0 mOsm/L";
@@ -678,10 +676,8 @@
             const dr = document.getElementById('physician-name').value || "N/A";
             const ph = document.getElementById('pharmacist-name').value || "N/A";
 
-            const w_en_val = document.getElementById('en-weight').value;
-            const w_tpn_val = document.getElementById('tpn-weight').value;
-            const w_en = parseFloat(w_en_val) || 0;
-            const w_tpn = parseFloat(w_tpn_val) || 0;
+            const w_en = parseFloat(document.getElementById('en-weight').value) || 0;
+            const w_tpn = parseFloat(document.getElementById('tpn-weight').value) || 0;
             
             if (w_en <= 0 && w_tpn <= 0) {
                 alert("No data found to share. Please add weight to EN or TPN.");
@@ -695,7 +691,6 @@
             text += `👨‍⚕️ Dr: ${dr} | 💊 Ph: ${ph}\n`;
             text += `--------------------------\n\n`;
             
-            // Enteral Nutrition Section
             if (w_en > 0) {
                 text += `🟣 ENTERAL NUTRITION (EN)\n`;
                 text += `⚖️ Weight: ${w_en} kg\n`;
@@ -709,14 +704,14 @@
                 text += `\n`;
             }
             
-            // Parenteral Nutrition Section
             if (w_tpn > 0) {
                 text += `🔵 PARENTERAL NUTRITION (TPN)\n`;
                 text += `⚖️ Weight: ${w_tpn} kg\n`;
                 text += `• GIR: ${document.getElementById('in-gir').value} mg/kg/min\n`;
                 text += `• Total Fluid: ${document.getElementById('res-tpn-total-vol').innerText} ml\n`;
+                text += `• Infusion Duration: ${document.getElementById('tpn-infusion-hours').value} hours\n`;
+                text += `• TPN Rate: ${document.getElementById('res-tpn-rate').innerText}\n`;
                 text += `• TPN Energy: ${document.getElementById('res-tpn-total-kcal').innerText} kcal\n`;
-                text += `• Total Energy (EN+TPN): ${document.getElementById('res-total-energy-kg').innerText} kcal/kg\n`;
                 text += `• Osmolarity: ${document.getElementById('res-osmolarity').innerText}\n`;
                 text += `• Glu Conc: ${document.getElementById('res-glu-conc').innerText}\n`;
                 text += `--- TPN Ingredients ---\n`;
@@ -726,7 +721,6 @@
                 text += `\n`;
             }
 
-            // Monitoring Section
             const labs = document.getElementById('monitoring-labs').value;
             const clinical = document.getElementById('monitoring-clinical').value;
             const plan = document.getElementById('monitoring-plan').value;
