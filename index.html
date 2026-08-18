@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nutrition in NICU - Dr. Ahmed Galal</title>
+    <title>Nutrition Support Calculator - Dr. Ahmed Galal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
@@ -145,6 +145,7 @@
             color: white;
         }
 
+        /* Nested tab button style */
         .nested-tab-btn {
             padding: 6px 12px;
             cursor: pointer;
@@ -193,6 +194,7 @@
             unicode-bidi: bidi-override;
         }
 
+        /* Forces left alignment for specific medical info blocks */
         .ltr-block {
             direction: ltr;
             text-align: left;
@@ -204,11 +206,11 @@
     <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 container-main">
         <!-- Header -->
         <div class="bg-blue-900 text-white p-6 text-center">
-            <h1 class="text-3xl font-bold tracking-tight">Nutrition in NICU</h1>
-            <div class="mt-2 flex flex-col items-center justify-center">
-                <div class="flex items-center gap-2">
+            <h1 class="text-3xl font-bold tracking-tight">Nutrition Support Calculator</h1>
+            <div class="mt-2 flex flex-col items-center justify-center gap-1">
+                <div class="flex items-center">
                     <p class="text-blue-200 text-lg">Developed by Dr. Ahmed Galal</p>
-                    <a href="https://www.linkedin.com/in/ahmad-galal-a1200714b" target="_blank" class="text-white hover:text-blue-300 transition-colors no-print">
+                    <a href="https://www.linkedin.com/in/ahmad-galal-a1200714b" target="_blank" class="text-white hover:text-blue-300 transition-colors mr-2 no-print">
                         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                         </svg>
@@ -246,6 +248,7 @@
                 </div>
             </div>
 
+            <!-- Diagnosis Rows -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 patient-info-row">
                 <div class="flex flex-col gap-1">
                     <label class="font-bold text-gray-700">Clinical Diagnosis:</label>
@@ -282,77 +285,227 @@
             <div id="section-en" class="tab-content space-y-6">
                 <h2 class="text-2xl font-bold text-purple-800 border-r-4 border-purple-600 pr-3">Enteral Nutrition (EN)</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-purple-50 p-6 rounded-xl border border-purple-100 no-print">
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Weight (kg) - EN</label>
-                        <input type="text" id="en-weight" inputmode="decimal" placeholder="Enter Weight" class="weight-input-ltr" oninput="calculateEN()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Feeding Option</label>
-                        <select id="en-option" onchange="calculateEN()">
-                            <option value="Breast milk">Breast milk</option>
-                            <option value="Term formula">Term formula</option>
-                            <option value="Post discharge formula">Post discharge formula</option>
-                            <option value="Preterm formula">Preterm formula</option>
-                            <option value="High caloric formula">High caloric formula</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Frequency (Every ... hours)</label>
-                        <div class="flex items-center gap-2">
-                            <span>Every</span>
-                            <input type="number" id="en-hours" value="3" oninput="calculateEN()">
-                            <span>Hours</span>
+                <!-- DROPDOWN COLLapsible: Volume-based Approach -->
+                <div class="border border-purple-200 rounded-xl overflow-hidden shadow-sm">
+                    <button onclick="toggleENAccordion('en-volume-content', 'en-volume-arrow')" class="w-full bg-purple-100 p-4 text-purple-900 font-bold flex justify-between items-center text-lg hover:bg-purple-200 transition-colors">
+                        <span>Volume-based approach</span>
+                        <svg id="en-volume-arrow" class="w-6 h-6 transform transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <div id="en-volume-content" class="p-4 md:p-6 space-y-6 bg-white">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-purple-50 p-6 rounded-xl border border-purple-100 no-print">
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Weight (kg) - EN</label>
+                                <input type="text" id="en-weight" inputmode="decimal" placeholder="Enter Weight" class="weight-input-ltr" oninput="calculateEN()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Feeding Option</label>
+                                <input type="text" id="en-option" placeholder="Enter feeding option e.g. Breast milk, Preterm formula" oninput="calculateEN()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Frequency (Every ... hours)</label>
+                                <div class="flex items-center gap-2">
+                                    <span>Every</span>
+                                    <input type="number" id="en-hours" value="3" oninput="calculateEN()">
+                                    <span>Hours</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50 p-6 rounded-xl border border-blue-100 no-print">
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Fortification?</label>
+                                <select id="en-fort-choice" onchange="toggleFortifier(); calculateEN()">
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                            <div id="fortifier-box" class="hidden space-y-2">
+                                <label class="block text-sm font-bold mb-1">Fortification Instructions</label>
+                                <textarea id="en-fort-instructions" rows="2" placeholder="e.g. Add 1 sachet to 25ml" oninput="calculateEN()"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-indigo-50 p-6 rounded-xl no-print">
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Initiation (ml/kg/d)</label>
+                                <input type="number" id="en-init-rate" value="20" oninput="calculateEN()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Advancement (ml/kg/d)</label>
+                                <input type="number" id="en-advance" value="20" oninput="calculateEN()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Goal Volume (ml/kg/d)</label>
+                                <input type="number" id="en-goal" value="150" oninput="calculateEN()">
+                            </div>
+                        </div>
+
+                        <div class="highlight-box space-y-4">
+                            <div class="flex justify-between items-center no-print border-b border-blue-200 pb-2 mb-2">
+                                <h3 class="font-bold text-blue-900">Feeding Summary</h3>
+                                <div class="flex gap-2">
+                                    <button onclick="smartShare()" class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 font-bold flex items-center gap-1">
+                                        SHARE
+                                    </button>
+                                    <button onclick="smartPrint()" class="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-800 font-bold flex items-center gap-1">
+                                        PRINT
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-lg leading-relaxed">
+                                • Start by <span id="res-en-start" class="font-bold text-blue-700">0</span> ml 
+                                Every <span id="res-en-interval" class="font-bold text-blue-700">0</span> Hours.<br>
+                                • Increase by <span id="res-en-inc" class="font-bold text-blue-700">0</span> ml Every Day.<br>
+                                • To max of <span id="res-en-max" class="font-bold text-blue-700">0</span> ml 
+                                Every <span id="res-en-interval-2" class="font-bold text-blue-700">0</span> Hours.<br>
+                                • Using: <span id="res-en-final-option" class="font-bold text-blue-700">-</span>.
+                                <div id="res-en-fort-display" class="mt-2 text-purple-700 font-bold hidden border-t border-blue-200 pt-2">
+                                    • Fortification: <span id="res-en-fort-text"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50 p-6 rounded-xl border border-blue-100 no-print">
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Fortification?</label>
-                        <select id="en-fort-choice" onchange="toggleFortifier(); calculateEN()">
-                            <option value="no">No</option>
-                            <option value="yes">Yes</option>
-                        </select>
-                    </div>
-                    <div id="fortifier-box" class="hidden space-y-2">
-                        <label class="block text-sm font-bold mb-1">Fortification Instructions</label>
-                        <textarea id="en-fort-instructions" rows="2" placeholder="e.g. Add 1 sachet to 25ml" oninput="calculateEN()"></textarea>
-                    </div>
-                </div>
+                <!-- DROPDOWN COLLapsible: Calories-based Approach -->
+                <div class="border border-indigo-200 rounded-xl overflow-hidden shadow-sm">
+                    <button onclick="toggleENAccordion('en-calories-content', 'en-calories-arrow')" class="w-full bg-indigo-100 p-4 text-indigo-900 font-bold flex justify-between items-center text-lg hover:bg-indigo-200 transition-colors">
+                        <span>Calories-based approach</span>
+                        <svg id="en-calories-arrow" class="w-6 h-6 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-indigo-50 p-6 rounded-xl no-print">
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Initiation (ml/kg/d)</label>
-                        <input type="number" id="en-init-rate" value="20" oninput="calculateEN()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Advancement (ml/kg/d)</label>
-                        <input type="number" id="en-advance" value="20" oninput="calculateEN()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Goal Volume (ml/kg/d)</label>
-                        <input type="number" id="en-goal" value="150" oninput="calculateEN()">
-                    </div>
-                </div>
-
-                <div class="highlight-box space-y-4">
-                    <div class="flex justify-between items-center no-print border-b border-blue-200 pb-2 mb-2">
-                        <h3 class="font-bold text-blue-900">Feeding Summary</h3>
-                        <div class="flex gap-2">
-                            <button onclick="smartShare()" class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 font-bold flex items-center gap-1">SHARE</button>
-                            <button onclick="smartPrint()" class="bg-gray-700 text-white text-xs px-3 py-1 rounded hover:bg-gray-800 font-bold flex items-center gap-1">PRINT</button>
+                    <div id="en-calories-content" class="hidden p-4 md:p-6 space-y-6 bg-white ltr-block">
+                        <!-- 1. Requirements -->
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-3">
+                            <h3 class="font-bold text-emerald-900 text-center border-b border-emerald-200 pb-2">Requirements</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Weight (kg)</label>
+                                    <input type="text" id="cb-weight" value="2" class="weight-input-ltr bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">kcal / kg</label>
+                                    <input type="number" id="cb-kcal-kg" value="120" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Total Calories (kcal/d)</label>
+                                    <div id="cb-res-total-cal" class="bg-emerald-100 p-2 rounded text-center font-bold text-emerald-900 border border-emerald-300">240</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Target water ml / kg / d</label>
+                                    <input type="number" id="cb-target-water" value="128" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Total water ml / d</label>
+                                    <div id="cb-res-total-water" class="bg-emerald-100 p-2 rounded text-center font-bold text-emerald-900 border border-emerald-300">256</div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Protein g / kg / d</label>
+                                    <input type="number" id="cb-target-protein" value="3" step="0.1" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Total protein g / d</label>
+                                    <div id="cb-res-total-protein" class="bg-emerald-100 p-2 rounded text-center font-bold text-emerald-900 border border-emerald-300">6</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="text-lg leading-relaxed">
-                        • Start by <span id="res-en-start" class="font-bold text-blue-700">0</span> ml 
-                        Every <span id="res-en-interval" class="font-bold text-blue-700">0</span> Hours.<br>
-                        • Increase by <span id="res-en-inc" class="font-bold text-blue-700">0</span> ml Every Day.<br>
-                        • To max of <span id="res-en-max" class="font-bold text-blue-700">0</span> ml 
-                        Every <span id="res-en-interval-2" class="font-bold text-blue-700">0</span> Hours.<br>
-                        • Using: <span id="res-en-final-option" class="font-bold text-blue-700">-</span>.
-                        <div id="res-en-fort-display" class="mt-2 text-purple-700 font-bold hidden border-t border-blue-200 pt-2">
-                            • Fortification: <span id="res-en-fort-text"></span>
+
+                        <!-- 2. Formula -->
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 space-y-3">
+                            <h3 class="font-bold text-blue-900 text-center border-b border-blue-200 pb-2">Formula</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Formula Name</label>
+                                    <input type="text" id="cb-formula-name" placeholder="Formula Name" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Free water %</label>
+                                    <input type="number" id="cb-free-water-pct" value="88" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Caloric density (kcal/ml)</label>
+                                    <input type="number" id="cb-caloric-density" value="0.67" step="0.01" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Protein Formula g /100 ml</label>
+                                    <input type="number" id="cb-protein-density" value="1.2" step="0.1" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <label class="block text-xs font-bold mb-1 text-blue-900">Feeding Volume (ml/d)</label>
+                                <div id="cb-res-feeding-volume" class="bg-blue-100 p-2 rounded text-center font-bold text-blue-900 text-lg border border-blue-300">358.21</div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Gap Analysis -->
+                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 space-y-3">
+                            <h3 class="font-bold text-amber-900 text-center border-b border-amber-200 pb-2">Gap Analysis</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                <div class="bg-white p-3 rounded border text-center">
+                                    <span class="text-xs font-bold text-gray-600 block">Water Gap (ml)</span>
+                                    <span id="cb-res-water-gap" class="font-bold text-lg text-amber-800">59.22</span>
+                                </div>
+                                <div colspan="2" class="md:col-span-2 bg-amber-100 p-3 rounded border border-amber-300 text-sm font-semibold text-amber-900" id="cb-water-gap-msg">
+                                    Water from formula exceeds requirements, Consider increasing caloric density to >= 0.8 Kcal/ml
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center pt-2">
+                                <div class="bg-white p-3 rounded border text-center">
+                                    <span class="text-xs font-bold text-gray-600 block">Protein Gap (g)</span>
+                                    <span id="cb-res-protein-gap" class="font-bold text-lg text-amber-800">-1.70</span>
+                                </div>
+                                <div class="md:col-span-2 bg-amber-100 p-3 rounded border border-amber-300 text-sm font-semibold text-amber-900" id="cb-protein-gap-msg">
+                                    provided protein is short by 1.70 g
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <label class="block text-xs font-bold mb-1 text-gray-700">Fortification Instructions</label>
+                                <textarea id="cb-fort-instructions" rows="2" placeholder="Enter fortification instructions" class="bg-white" oninput="calculateCalorieBased()"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- 4. Feeding Rate -->
+                        <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 space-y-3">
+                            <h3 class="font-bold text-purple-900 text-center border-b border-purple-200 pb-2">Feeding Rate</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Initiation %</label>
+                                    <input type="number" id="cb-init-pct" value="50" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Advance %</label>
+                                    <input type="number" id="cb-advance-pct" value="20" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Goal ml / d</label>
+                                    <div id="cb-res-goal-mld" class="bg-purple-100 p-2 rounded text-center font-bold text-purple-900 border border-purple-300">358.21</div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Frequency (Every -- h)</label>
+                                    <input type="number" id="cb-freq-hours" value="3" class="bg-white" oninput="calculateCalorieBased()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Feeding Summary -->
+                        <div class="highlight-box space-y-2 text-center text-gray-800 font-semibold">
+                            <h3 class="font-bold text-blue-900 border-b border-blue-200 pb-2 text-lg">Feeding Summary (Calories-based)</h3>
+                            <div>Start by <span id="cb-res-summary-start" class="text-blue-700 font-bold">22.39</span> ml every <span id="cb-res-summary-freq1" class="text-blue-700 font-bold">3</span> hour</div>
+                            <div>Increase by <span id="cb-res-summary-inc" class="text-blue-700 font-bold">8.96</span> ml every day</div>
+                            <div>To goal of <span id="cb-res-summary-goal" class="text-blue-700 font-bold">44.78</span> ml every <span id="cb-res-summary-freq2" class="text-blue-700 font-bold">3</span> h</div>
+                            <div>Using : <span id="cb-res-summary-formula" class="text-blue-700 font-bold">-</span></div>
+                            <div>Fortification Instructions : <span id="cb-res-summary-fort" class="text-purple-700 font-bold">-</span></div>
+                            <div id="cb-res-summary-flush-container" class="text-amber-800 font-bold hidden">water flushing : <span id="cb-res-summary-flush">0</span> ml</div>
                         </div>
                     </div>
                 </div>
@@ -365,75 +518,58 @@
                 <h2 class="text-2xl font-bold text-blue-800 border-r-4 border-blue-600 pr-3">Parenteral Nutrition (TPN)</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
-                    
-                    <div class="flex flex-col gap-6">
-                        <!-- 1. Energy Management -->
-                        <div class="bg-gray-50 p-4 rounded-xl border">
-                            <h4 class="font-bold mb-3 text-blue-900">Energy Management</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="col-span-2 md:col-span-1">
-                                    <label class="text-xs font-bold">Weight</label>
-                                    <div class="flex">
-                                        <input type="text" id="tpn-weight" inputmode="decimal" placeholder="Weight" class="weight-input-ltr rounded-l-md border-r-0 w-2/3" oninput="calculateTPN()">
-                                        <select id="tpn-weight-unit" class="rounded-r-md w-1/3 bg-gray-100 text-xs font-bold" onchange="calculateTPN()">
-                                            <option value="kg">kg</option>
-                                            <option value="g">g</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="text-xs font-bold text-blue-700">Target Energy (kcal/kg/d)</label>
-                                    <input type="number" id="tpn-target-energy-kg" value="110" step="1" oninput="calculateTPN()" class="bg-blue-50 border-blue-300 font-bold">
-                                </div>
-                                <div class="bg-white p-2 rounded border border-gray-200 flex flex-col justify-center text-center">
-                                    <span class="text-[10px] text-gray-500 font-bold uppercase">Total Energy (Kcal/d)</span>
-                                    <span id="res-tpn-total-energy-calc" class="font-bold text-gray-800">0</span>
-                                </div>
-                                <div>
-                                    <label class="text-xs font-bold">Formula Caloric Density</label>
-                                    <input type="number" id="tpn-caloric-density" value="0.67" step="0.01" oninput="calculateTPN()">
-                                </div>
-                                <div class="bg-white p-2 rounded border border-blue-100 flex flex-col justify-center text-center">
-                                    <span class="text-[10px] text-blue-600 font-bold uppercase">Enteral Energy</span>
-                                    <span id="res-enteral-energy" class="font-bold text-blue-800">0 kcal</span>
-                                </div>
-                                <div class="bg-blue-900 text-white p-2 rounded border border-blue-700 flex flex-col justify-center text-center">
-                                    <span class="text-[10px] text-blue-200 font-bold uppercase">Remaining Energy for TPN</span>
-                                    <span id="res-tpn-energy-need" class="font-bold">0 kcal</span>
-                                </div>
+                    <div class="bg-gray-50 p-4 rounded-xl border">
+                        <h4 class="font-bold mb-3 text-blue-900">Fluid & Energy Management</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold">Fluid (ml/kg/d)</label>
+                                <input type="number" id="tpn-fluid-kg" value="100" oninput="calculateTPN()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold">Weight (kg) - TPN</label>
+                                <input type="text" id="tpn-weight" inputmode="decimal" placeholder="Enter Weight" class="weight-input-ltr" oninput="calculateTPN()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-blue-700">Target Energy (kcal/kg/d)</label>
+                                <input type="number" id="tpn-target-energy-kg" value="110" step="1" oninput="calculateTPN()" class="bg-blue-50 border-blue-300 font-bold">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold">Enteral Fluid (ml)</label>
+                                <input type="number" id="tpn-enteral-fluid" value="0" oninput="calculateTPN()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold">Formula Caloric Density</label>
+                                <input type="number" id="tpn-caloric-density" value="0.67" step="0.01" oninput="calculateTPN()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold">Other Fluid (ml)</label>
+                                <input type="number" id="tpn-other-input" value="0" oninput="calculateTPN()">
+                            </div>
+                            <div class="bg-white p-2 rounded border border-blue-100 flex flex-col justify-center">
+                                <span class="text-[10px] text-blue-600 font-bold uppercase">Enteral Energy</span>
+                                <span id="res-enteral-energy" class="font-bold text-blue-800">0 kcal</span>
+                            </div>
+                            <div class="bg-blue-900 text-white p-2 rounded border border-blue-700 flex flex-col justify-center">
+                                <span class="text-[10px] text-blue-200 font-bold uppercase">Remaining for TPN</span>
+                                <span id="res-tpn-energy-need" class="font-bold">0 kcal/kg</span>
                             </div>
                         </div>
-
-                        <!-- 2. Fluid Management -->
-                        <div class="bg-gray-50 p-4 rounded-xl border">
-                            <h4 class="font-bold mb-3 text-blue-900">Fluid Management</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-xs font-bold">Target Fluid (ml/kg/d)</label>
-                                    <input type="number" id="tpn-fluid-kg" value="100" oninput="calculateTPN()">
-                                </div>
-                                <div class="bg-white p-2 rounded border border-gray-200 flex flex-col justify-center text-center">
-                                    <span class="text-[10px] text-gray-500 font-bold uppercase">Total fluid (ml/d)</span>
-                                    <span id="res-tpn-total-fluid-calc" class="font-bold text-gray-800">0</span>
-                                </div>
-                                <div>
-                                    <label class="text-xs font-bold">Enteral Fluid (ml)</label>
-                                    <input type="number" id="tpn-enteral-fluid" value="0" oninput="calculateTPN()">
-                                </div>
-                                <div>
-                                    <label class="text-xs font-bold">Medication fluid (ml)</label>
-                                    <input type="number" id="tpn-other-input" value="0" oninput="calculateTPN()">
-                                </div>
-                            </div>
-                            <div class="mt-4 p-2 bg-blue-100 rounded text-center text-xs">
-                                Remaining Fluid for TPN: <span id="res-tpn-remain-fluid" class="font-bold text-lg text-blue-800">0</span> ml
-                            </div>
+                        <div class="mt-4 p-2 bg-blue-100 rounded text-center text-xs">
+                            TPN Fluid: <span id="res-tpn-remain-fluid" class="font-bold">0</span> ml
                         </div>
                     </div>
 
-                    <!-- 3. Glucose Management -->
-                    <div class="bg-gray-50 p-4 rounded-xl border h-fit">
-                        <h4 class="font-bold mb-3 text-blue-900">Glucose Management</h4>
+                    <div class="bg-gray-50 p-4 rounded-xl border">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-blue-900">Glucose Management</h4>
+                            <div class="flex items-center gap-2 bg-blue-100 px-3 py-1 rounded-full border border-blue-200">
+                                <span class="text-xs font-bold text-blue-900">Auto Conc %</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="glu-toggle-auto" checked onchange="toggleGlucoseMode()" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="text-xs font-bold">Set GIR (mg/kg/min)</label>
@@ -441,7 +577,7 @@
                             </div>
                             <div class="col-span-2 grid grid-cols-3 gap-2">
                                 <div>
-                                    <label class="text-xs font-bold">Other Glucose rate</label>
+                                    <label class="text-xs font-bold">Other Rate</label>
                                     <input type="number" id="in-glu-other-rate" value="0" oninput="calculateTPN()">
                                 </div>
                                 <div>
@@ -455,7 +591,7 @@
                             </div>
                         </div>
                         <div class="mt-4 p-2 bg-yellow-100 rounded text-center text-xs font-bold">
-                            Glucose total: <span id="res-glu-total-final">0</span> g
+                            Glucose Total: <span id="res-glu-total-final">0 g</span>
                         </div>
                     </div>
                 </div>
@@ -470,6 +606,7 @@
                             <thead>
                                 <tr>
                                     <th>Component</th>
+                                    <th>Concentration %</th>
                                     <th>Intake (g/kg/d)</th>
                                     <th>Total Amt</th>
                                     <th>Volume (ml)</th>
@@ -478,12 +615,9 @@
                             </thead>
                             <tbody>
                                 <tr>
+                                    <td class="font-bold">Protein</td>
                                     <td>
-                                        <select id="sel-prot-conc" onchange="calculateTPN()" class="component-select">
-                                            <option value="7.2">Protein 7.2%</option>
-                                            <option value="8">Protein 8%</option>
-                                            <option value="10" selected>Protein 10%</option>
-                                        </select>
+                                        <input type="number" id="in-prot-conc" value="10" step="0.1" oninput="calculateTPN()" placeholder="10">
                                     </td>
                                     <td><input type="number" id="in-prot" value="3" step="0.1" oninput="calculateTPN()"></td>
                                     <td id="res-prot-total">0</td>
@@ -491,12 +625,9 @@
                                     <td id="res-prot-kcal">0</td>
                                 </tr>
                                 <tr>
+                                    <td class="font-bold">Lipid</td>
                                     <td>
-                                        <select id="sel-lipid-conc" onchange="calculateTPN()" class="component-select">
-                                            <option value="10">Lipid 10%</option>
-                                            <option value="20" selected>Lipid 20%</option>
-                                            <option value="30">Lipid 30%</option>
-                                        </select>
+                                        <input type="number" id="in-lipid-conc" value="20" step="0.1" oninput="calculateTPN()" placeholder="20">
                                     </td>
                                     <td><input type="number" id="in-lipid" value="1" step="0.1" oninput="calculateTPN()"></td>
                                     <td id="res-lipid-total">0</td>
@@ -505,7 +636,11 @@
                                 </tr>
                                 <tr class="bg-blue-50">
                                     <td class="font-bold">Glucose</td>
-                                    <td class="text-xs">Auto (GIR)</td>
+                                    <td>
+                                        <div id="res-glu-conc-display" class="font-bold text-blue-800">0%</div>
+                                        <input type="number" id="in-glu-conc-manual" value="10" step="0.1" oninput="calculateTPN()" class="hidden text-xs py-1">
+                                    </td>
+                                    <td id="res-glu-intake-cell" class="text-xs">Auto (GIR)</td>
                                     <td id="res-glu-total-tpn">0</td>
                                     <td id="res-glu-vol-container">
                                         <span id="res-glu-vol-tpn">0</span>
@@ -520,27 +655,31 @@
                                             <option value="0.9">NaCl 0.9%</option>
                                         </select>
                                     </td>
+                                    <td>-</td>
                                     <td><input type="number" id="in-nacl" value="3" oninput="calculateTPN()" placeholder="mEq/kg/d"></td>
                                     <td id="res-nacl-total">0</td>
                                     <td id="res-nacl-vol">0</td>
                                     <td>-</td>
                                 </tr>
                                 <tr>
-                                    <td class="font-bold text-xs">KCl 15% (mEq)</td>
+                                    <td class="font-bold text-xs">KCl 15% (mmol)</td>
+                                    <td>-</td>
                                     <td><input type="number" id="in-kcl" value="2" oninput="calculateTPN()"></td>
                                     <td id="res-kcl-total">0</td>
                                     <td id="res-kcl-vol">0</td>
                                     <td>-</td>
                                 </tr>
                                 <tr>
-                                    <td class="font-bold text-xs">Ca Gluconate 10%</td>
+                                    <td class="font-bold text-xs">Ca Gluconate 10% (mmol)</td>
+                                    <td>-</td>
                                     <td><input type="number" id="in-ca" value="2" oninput="calculateTPN()"></td>
                                     <td id="res-ca-total">0</td>
                                     <td id="res-ca-vol">0</td>
                                     <td>-</td>
                                 </tr>
                                 <tr>
-                                    <td class="font-bold text-xs">Mg 8% (mEq)</td>
+                                    <td class="font-bold text-xs">Mg 10% (mmol)</td>
+                                    <td>-</td>
                                     <td><input type="number" id="in-mg" value="0.5" oninput="calculateTPN()"></td>
                                     <td id="res-mg-total">0</td>
                                     <td id="res-mg-vol">0</td>
@@ -548,6 +687,7 @@
                                 </tr>
                                 <tr>
                                     <td class="font-bold text-xs">Phosphorus (mmol)</td>
+                                    <td>-</td>
                                     <td><input type="number" id="in-phos" value="1" oninput="calculateTPN()"></td>
                                     <td id="res-phos-total">0</td>
                                     <td id="res-phos-vol">0</td>
@@ -560,6 +700,7 @@
                                             <option value="Addaven">Addaven</option>
                                         </select>
                                     </td>
+                                    <td>-</td>
                                     <td colspan="2"><input type="number" id="in-trace-vol" placeholder="ml" value="0" oninput="calculateTPN()"></td>
                                     <td>-</td>
                                 </tr>
@@ -570,23 +711,25 @@
                                             <option value="Adult">Vitalipid N Adult</option>
                                         </select>
                                     </td>
+                                    <td>-</td>
                                     <td colspan="2"><input type="number" id="in-vitalipid-vol" placeholder="ml" value="0" oninput="calculateTPN()"></td>
                                     <td>-</td>
                                 </tr>
                                 <tr class="bg-emerald-50">
                                     <td colspan="2" class="text-xs font-bold">Soluvito N (ml)</td>
+                                    <td>-</td>
                                     <td colspan="2"><input type="number" id="in-soluvito-vol" placeholder="ml" value="0" oninput="calculateTPN()"></td>
                                     <td>-</td>
                                 </tr>
                             </tbody>
                             <tfoot class="bg-gray-100 font-bold">
                                 <tr>
-                                    <td colspan="3">TPN Volume Sum</td>
+                                    <td colspan="4">TPN Volume Sum</td>
                                     <td id="res-tpn-total-vol">0</td>
-                                    <td id="res-tpn-total-kcal-table">0</td>
+                                    <td id="res-tpn-total-kcal">0</td>
                                 </tr>
                                 <tr class="bg-blue-100 text-blue-900">
-                                    <td colspan="2">Infusion Duration (Hours)</td>
+                                    <td colspan="3">Infusion Duration (Hours)</td>
                                     <td><input type="number" id="tpn-infusion-hours" value="24" oninput="calculateTPN()" class="bg-white border-blue-300 font-bold"></td>
                                     <td class="text-sm">TPN Rate:</td>
                                     <td id="res-tpn-rate" class="text-lg">0 ml/hr</td>
@@ -647,11 +790,13 @@
             <div id="section-ref" class="hidden space-y-6">
                 <h2 class="text-2xl font-bold text-emerald-800 border-r-4 border-emerald-600 pr-3">Information & Reference</h2>
                 
+                <!-- Sub-tabs for Reference (EN vs PN) -->
                 <div class="flex bg-gray-100 p-2 rounded-lg gap-2 no-print">
                     <button onclick="switchSubTab('enteral')" id="sub-tab-enteral" class="sub-tab-btn active flex-1">Enteral (EN)</button>
                     <button onclick="switchSubTab('parenteral')" id="sub-tab-parenteral" class="sub-tab-btn flex-1">Parenteral (PN)</button>
                 </div>
 
+                <!-- ENTERAL REFERENCE CONTENT -->
                 <div id="sub-content-enteral" class="p-6 bg-white border rounded-xl shadow-sm min-h-[400px]">
                     <div class="flex flex-wrap gap-2 mb-6 border-b pb-4 no-print">
                         <button onclick="switchEnNested('energy')" id="en-btn-energy" class="nested-tab-btn active">Energy Req.</button>
@@ -692,7 +837,7 @@
                             <div class="p-4 bg-mod-risk rounded-lg">
                                 <h4 class="font-bold text-amber-800 mb-1">Moderate Risk</h4>
                                 <ul class="list-disc pl-5 text-sm space-y-1">
-                                    <li>28+1 - 31+6 gestation or Very Low Birth Weight 1000-1500g</li>
+                                    <li>28+1 - 31+6 gestation or VLBW 1000-1500g</li>
                                     <li>Complex congenital cardiac disease</li>
                                     <li>Dexamethasone treatment</li>
                                     <li>Indomethacin or Ibuprofen treatment for PDA</li>
@@ -704,11 +849,11 @@
                             <div class="p-4 bg-high-risk rounded-lg">
                                 <h4 class="font-bold text-red-800 mb-1">High Risk</h4>
                                 <ul class="list-disc pl-5 text-sm space-y-1">
-                                    <li>&lt; 28 weeks gestation or Extremely Low Birth Weight &lt; 1000g</li>
+                                    <li>&lt; 28 weeks gestation or ELBW &lt; 1000g</li>
                                     <li>Absent or reversed end diastolic flow in infants &lt; 34 weeks</li>
                                     <li>Perinatal hypoxia-ischaemia with organ dysfunction</li>
                                     <li>Hypotensive / unstable ventilated neonates</li>
-                                    <li>Commencing feeds after an episode of NEC or gastrointestinal surgery</li>
+                                    <li>Commencing feeds after an episode of NEC or GI surgery</li>
                                 </ul>
                             </div>
                         </div>
@@ -725,15 +870,11 @@
                                 </div>
                                 <div class="infograph-step">
                                     <span class="font-bold block text-emerald-700">Step 2</span>
-                                    <p class="text-xs">Start full enteral feeds 60-90 mL/kg/day as 2 to 3 hourly boluses as soon as possible.</p>
+                                    <p class="text-xs">Start full enteral feeds 60-90 mL/kg/day as 2 to 3 hourly boluses.</p>
                                 </div>
                                 <div class="infograph-step">
                                     <span class="font-bold block text-emerald-700">Step 3</span>
                                     <p class="text-xs">Advance feeds as tolerated 30-40 mL/kg/day.</p>
-                                </div>
-                                <div class="infograph-step">
-                                    <span class="font-bold block text-emerald-700">Step 4</span>
-                                    <p class="text-xs italic">Continue to monitor feed tolerance regularly with cares.</p>
                                 </div>
                             </div>
                             <div class="border rounded-xl p-4 bg-blue-50 border-blue-200">
@@ -744,21 +885,18 @@
                                 </div>
                                 <div class="infograph-step" style="border-left-color: #3b82f6;">
                                     <span class="font-bold block text-blue-700">24 - 48 Hours</span>
-                                    <p class="text-xs">Continue colostrum as available until sufficient MBM is supplied to start trophic feeds (10 - 20 ml / kg /day).</p>
-                                </div>
-                                <div class="infograph-step" style="border-left-color: #3b82f6;">
-                                    <span class="font-bold block text-blue-700">At 48 Hours</span>
-                                    <p class="text-xs">If no MBM, discuss donor breastmilk (DBM) or baby formula with parents.</p>
+                                    <p class="text-xs">Continue colostrum until enough MBM available for trophic feeds (10-20 ml/kg/day).</p>
                                 </div>
                                 <div class="infograph-step" style="border-left-color: #3b82f6;">
                                     <span class="font-bold block text-blue-700">Advancement</span>
-                                    <p class="text-xs">20 - 30 ml /kg / day. Aim to decrease PN only once baby on total fluids of 150ml/kg/day.</p>
+                                    <p class="text-xs">20-30 ml/kg/day. Decrease PN only once on total fluids of 150ml/kg/day.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- PARENTERAL REFERENCE CONTENT -->
                 <div id="sub-content-parenteral" class="hidden p-6 bg-white border rounded-xl shadow-sm min-h-[400px]">
                     <div class="flex flex-wrap gap-2 mb-6 border-b pb-4 no-print">
                         <button onclick="switchPnNested('energy')" id="pn-btn-energy" class="nested-tab-btn active">Energy</button>
@@ -773,18 +911,11 @@
                     <div id="pn-nested-energy" class="pn-nested-content">
                         <span class="ref-section-title">Energy Requirement (Parenteral)</span>
                         <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Age</th>
-                                    <th>Energy (kcal / kg)</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Age</th><th>Energy (kcal / kg)</th></tr></thead>
                             <tbody>
                                 <tr><td>Preterm</td><td>90 - 120</td></tr>
                                 <tr><td>0 - 1 year</td><td>75 - 85</td></tr>
                                 <tr><td>1 - 7 year</td><td>65 - 75</td></tr>
-                                <tr><td>7 - 12 year</td><td>55 - 65</td></tr>
-                                <tr><td>12 - 18 year</td><td>30 - 55</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -792,19 +923,10 @@
                     <div id="pn-nested-fluid" class="pn-nested-content hidden">
                         <span class="ref-section-title">Fluid Requirement</span>
                         <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Age</th>
-                                    <th>Fluid (ml / kg)</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Age</th><th>Fluid (ml / kg)</th></tr></thead>
                             <tbody>
-                                <tr><td>Neonate (term or preterm)</td><td>140 - 180</td></tr>
-                                <tr><td>0 - 1 year (after first month)</td><td>120 - 150</td></tr>
-                                <tr><td>1 - 2 year</td><td>80 - 120</td></tr>
-                                <tr><td>2 - 7 year</td><td>80 - 100</td></tr>
-                                <tr><td>7 - 12 year</td><td>60 - 80</td></tr>
-                                <tr><td>12 - 18 year</td><td>50 - 70</td></tr>
+                                <tr><td>Neonate</td><td>140 - 180</td></tr>
+                                <tr><td>0 - 1 year</td><td>120 - 150</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -812,17 +934,10 @@
                     <div id="pn-nested-glucose" class="pn-nested-content hidden">
                         <span class="ref-section-title">Glucose Requirement</span>
                         <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Age</th>
-                                    <th>Goal GIR (mg / kg / min)</th>
-                                    <th>Advancement Notes</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Age</th><th>Goal GIR (mg / kg / min)</th></tr></thead>
                             <tbody>
-                                <tr><td>&lt; 1 year</td><td>10 - 14 (Max 14-18)</td><td>Start at 6-8 and increase gradually by 1-2 daily.</td></tr>
-                                <tr><td>1 - 10 year</td><td>8 - 10</td><td>Start at 3-6 and increase gradually by 1-2 daily.</td></tr>
-                                <tr><td>10 - 18 year</td><td>5 - 6</td><td>Start at 2-3 and increase gradually by 1-2 daily.</td></tr>
+                                <tr><td>&lt; 1 year</td><td>10 - 14</td></tr>
+                                <tr><td>1 - 10 year</td><td>8 - 10</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -830,18 +945,10 @@
                     <div id="pn-nested-protein" class="pn-nested-content hidden">
                         <span class="ref-section-title">Protein Requirement</span>
                         <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Age</th>
-                                    <th>Goal (g / kg / d)</th>
-                                    <th>Advancement Notes</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Age</th><th>Goal (g / kg / d)</th></tr></thead>
                             <tbody>
-                                <tr><td>Preterm neonate</td><td>3 - 4</td><td>Don't need to titrate</td></tr>
-                                <tr><td>Birth to age 1 y</td><td>2 - 3</td><td>Don't need to titrate</td></tr>
-                                <tr><td>Weight &gt; 10 kg or ages 1-10 y</td><td>1 - 2</td><td>Don't need to titrate</td></tr>
-                                <tr><td>Ages 11-17 y</td><td>0.8 - 1.5</td><td>Don't need to titrate</td></tr>
+                                <tr><td>Preterm neonate</td><td>3 - 4</td></tr>
+                                <tr><td>Birth to age 1 y</td><td>2 - 3</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -849,85 +956,30 @@
                     <div id="pn-nested-fat" class="pn-nested-content hidden">
                         <span class="ref-section-title">Fat Requirement</span>
                         <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Age</th>
-                                    <th>Goal (gram / kg / day)</th>
-                                    <th>Advancement Notes</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Age</th><th>Goal (gram / kg / day)</th></tr></thead>
                             <tbody>
-                                <tr><td>&lt; 1 year</td><td>3 - 4</td><td>Start at 0.5-1 and increase gradually by 0.5-1 daily.</td></tr>
-                                <tr><td>1 - 10 year</td><td>2 - 3</td><td>Start at 1-2 and increase gradually by 0.5-1 daily.</td></tr>
-                                <tr><td>10 - 18 year</td><td>1 - 2</td><td>Start at 1 and increase gradually by 1 daily.</td></tr>
+                                <tr><td>&lt; 1 year</td><td>3 - 4</td></tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div id="pn-nested-electrolytes" class="pn-nested-content hidden">
-                        <span class="ref-section-title">Electrolyte Requirement (Basic)</span>
+                        <span class="ref-section-title">Electrolyte Requirement</span>
                         <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Electrolyte</th>
-                                    <th>Na (mEq/kg/day)</th>
-                                    <th>K (mEq/kg/day)</th>
-                                    <th>Acetate</th>
-                                    <th>Chloride</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Electrolyte</th><th>Na (mEq/kg/d)</th><th>K (mmol/kg/d)</th></tr></thead>
                             <tbody>
-                                <tr><td>0 - 2 day</td><td>0 - 2</td><td>0 - 2</td><td>as needed for acid-base</td><td>as needed for acid-base</td></tr>
-                                <tr><td>3rd day - 18 year</td><td>2 - 4</td><td>2 - 4</td><td>as needed for acid-base</td><td>as needed for acid-base</td></tr>
-                                <tr><td>Child &gt; 50 kg</td><td>1 - 2</td><td>1 - 2</td><td>as needed for acid-base</td><td>as needed for acid-base</td></tr>
-                            </tbody>
-                        </table>
-                        <span class="ref-section-title">Electrolyte Requirement (Minerals)</span>
-                        <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Electrolyte</th>
-                                    <th>Magnesium (mEq/kg/d)</th>
-                                    <th>Calcium (mmol/kg/d)</th>
-                                    <th>Phosphorus (mmol/kg/d)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>Preterm 0 - 2 day</td><td>0.2</td><td>1 - 2</td><td>1 - 2</td></tr>
-                                <tr><td>Preterm (growing)</td><td>0.4</td><td>1.5 - 3.5</td><td>1.5 - 3.5</td></tr>
-                                <tr><td>Term 0 - 18 year</td><td>0.2</td><td>0-6m: 1, 6m-1y: 0.5, 1-18y: 0.25</td><td>0-6m: 1, 6m-1y: 0.5, 1-18y: 0.25</td></tr>
+                                <tr><td>3rd day - 18 year</td><td>2 - 4</td><td>2 - 4</td></tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div id="pn-nested-vitamins" class="pn-nested-content hidden">
-                        <span class="ref-section-title">Vitamins Requirement</span>
+                        <span class="ref-section-title">Vitamins & Trace Elements</span>
                         <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Age/Weight</th>
-                                    <th>Vitalipid N Infant</th>
-                                    <th>Vitalipid N Adult</th>
-                                    <th>Soluvit N</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Type</th><th>Dose</th></tr></thead>
                             <tbody>
-                                <tr><td>Preterm / LBW &lt; 2.5 kg</td><td>4 ml / kg / day</td><td>------------</td><td>(0.1 vial * Weight) / day</td></tr>
-                                <tr><td>&gt; 2.5 kg up to 11y</td><td>10 ml / day</td><td>------------</td><td>(0.1 vial * Weight) / day</td></tr>
-                                <tr><td>&gt; 11y & Adult</td><td>------------</td><td>1 ampoule (10 ml) / day</td><td>1 vial / day</td></tr>
-                            </tbody>
-                        </table>
-                        <span class="ref-section-title">Trace Elements Requirement</span>
-                        <table class="ref-table">
-                            <thead>
-                                <tr>
-                                    <th>Weight</th>
-                                    <th>Dose</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>&lt; 40 kg</td><td>Peditrace amp: 1 ml / kg (up to max 15 ml/day)</td></tr>
-                                <tr><td>40 kg</td><td>Addaven amp: 10 ml / day</td></tr>
+                                <tr><td>Peditrace</td><td>1 ml / kg (up to 15 ml/day)</td></tr>
+                                <tr><td>Vitalipid N Infant</td><td>4 ml / kg / day (&lt; 2.5kg)</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -963,12 +1015,124 @@
                 <button onclick="smartShare()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-12 rounded-full shadow-xl transition-all">SHARE REPORT</button>
             </div>
         </div>
-        <div class="bg-gray-100 p-4 text-center text-xs text-gray-500 border-t">
-            &copy; 2026 NICU Nutrition Assistant | Dr. Ahmed Galal | Pro Version
+
+        <!-- Final Footer -->
+        <div class="bg-gray-100 p-4 text-center text-xs text-gray-500 border-t flex items-center justify-center gap-2">
+            <span>&copy; 2026 Nutrition Support Calculator | Dr. Ahmed Galal | Pro Version</span>
+            <a href="https://www.linkedin.com/in/ahmad-galal-a1200714b" target="_blank" class="text-blue-600 hover:text-blue-800 no-print">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+            </a>
         </div>
     </div>
 
     <script>
+        function toggleENAccordion(contentId, arrowId) {
+            const content = document.getElementById(contentId);
+            const arrow = document.getElementById(arrowId);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleGlucoseMode() {
+            const isAuto = document.getElementById('glu-toggle-auto').checked;
+            const autoDisplay = document.getElementById('res-glu-conc-display');
+            const manualInput = document.getElementById('in-glu-conc-manual');
+
+            if (isAuto) {
+                autoDisplay.classList.remove('hidden');
+                manualInput.classList.add('hidden');
+            } else {
+                autoDisplay.classList.add('hidden');
+                manualInput.classList.remove('hidden');
+            }
+            calculateTPN();
+        }
+
+        function calculateCalorieBased() {
+            const weight = parseFloat(document.getElementById('cb-weight').value) || 0;
+            const kcalKg = parseFloat(document.getElementById('cb-kcal-kg').value) || 0;
+            const targetWaterKg = parseFloat(document.getElementById('cb-target-water').value) || 0;
+            const targetProteinKg = parseFloat(document.getElementById('cb-target-protein').value) || 0;
+
+            const totalCalories = weight * kcalKg;
+            const totalWater = weight * targetWaterKg;
+            const totalProtein = weight * targetProteinKg;
+
+            document.getElementById('cb-res-total-cal').innerText = totalCalories.toFixed(1);
+            document.getElementById('cb-res-total-water').innerText = totalWater.toFixed(1);
+            document.getElementById('cb-res-total-protein').innerText = totalProtein.toFixed(1);
+
+            const freeWaterPct = parseFloat(document.getElementById('cb-free-water-pct').value) || 0;
+            const caloricDensity = parseFloat(document.getElementById('cb-caloric-density').value) || 0;
+            const proteinDensity = parseFloat(document.getElementById('cb-protein-density').value) || 0;
+
+            const feedingVolume = caloricDensity > 0 ? (totalCalories / caloricDensity) : 0;
+            document.getElementById('cb-res-feeding-volume').innerText = feedingVolume.toFixed(2);
+
+            // Calculations for Gap
+            const waterFromFormula = (freeWaterPct * 0.01) * feedingVolume;
+            const waterGap = waterFromFormula - totalWater;
+            document.getElementById('cb-res-water-gap').innerText = waterGap.toFixed(2);
+
+            const waterGapMsgEl = document.getElementById('cb-water-gap-msg');
+            let flushDeficit = 0;
+            if (waterGap > 0) {
+                const targetCaloricDensityVal = totalWater > 0 ? ((totalCalories / totalWater) * 1.17).toFixed(2) : "0.8";
+                waterGapMsgEl.innerText = `Water from formula exceeds requirements, Consider increasing caloric density to >= ${targetCaloricDensityVal} Kcal/ml`;
+                document.getElementById('cb-res-summary-flush-container').classList.add('hidden');
+            } else if (waterGap < 0) {
+                flushDeficit = Math.abs(waterGap);
+                waterGapMsgEl.innerText = `Provided water is short by ${flushDeficit.toFixed(2)} ml. Administer this deficit as flushing throughout the day.`;
+                document.getElementById('cb-res-summary-flush-container').classList.remove('hidden');
+                document.getElementById('cb-res-summary-flush').innerText = flushDeficit.toFixed(2);
+            } else {
+                waterGapMsgEl.innerText = `Provided water meets exact requirement.`;
+                document.getElementById('cb-res-summary-flush-container').classList.add('hidden');
+            }
+
+            const providedProteinG = proteinDensity * feedingVolume * 0.01;
+            const proteinGap = providedProteinG - totalProtein;
+            document.getElementById('cb-res-protein-gap').innerText = proteinGap.toFixed(2);
+
+            const proteinGapMsgEl = document.getElementById('cb-protein-gap-msg');
+            if (proteinGap < 0) {
+                proteinGapMsgEl.innerText = `provided protein is short by ${Math.abs(proteinGap).toFixed(2)} g`;
+            } else if (proteinGap > 0) {
+                const targetProteinFormulaVal = feedingVolume > 0 ? (totalProtein / (feedingVolume * 0.01)).toFixed(2) : "0";
+                proteinGapMsgEl.innerText = `provided protein exceeds requirements by ${proteinGap.toFixed(2)} g. Consider a formula with a target of ${targetProteinFormulaVal} g / 100 ml`;
+            } else {
+                proteinGapMsgEl.innerText = `provided protein meets exact requirement.`;
+            }
+
+            // Feeding Rate & Summary
+            const initPct = parseFloat(document.getElementById('cb-init-pct').value) || 0;
+            const advancePct = parseFloat(document.getElementById('cb-advance-pct').value) || 0;
+            const freqHours = parseFloat(document.getElementById('cb-freq-hours').value) || 1;
+
+            const goalMlD = feedingVolume;
+            document.getElementById('cb-res-goal-mld').innerText = goalMlD.toFixed(2);
+
+            const freqPerDay = 24 / freqHours;
+            const startDoseMl = freqPerDay > 0 ? ((goalMlD * (initPct * 0.01)) / freqPerDay) : 0;
+            const incDoseMl = freqPerDay > 0 ? ((goalMlD * (advancePct * 0.01)) / freqPerDay) : 0;
+            const maxDoseMl = freqPerDay > 0 ? (goalMlD / freqPerDay) : 0;
+
+            document.getElementById('cb-res-summary-start').innerText = startDoseMl.toFixed(2);
+            document.getElementById('cb-res-summary-freq1').innerText = freqHours;
+            document.getElementById('cb-res-summary-inc').innerText = incDoseMl.toFixed(2);
+            document.getElementById('cb-res-summary-goal').innerText = maxDoseMl.toFixed(2);
+            document.getElementById('cb-res-summary-freq2').innerText = freqHours;
+            document.getElementById('cb-res-summary-formula').innerText = document.getElementById('cb-formula-name').value || "-";
+            document.getElementById('cb-res-summary-fort').innerText = document.getElementById('cb-fort-instructions').value || "-";
+        }
+
         function switchTab(tab) {
             document.getElementById('section-en').classList.toggle('hidden', tab !== 'en');
             document.getElementById('section-tpn').classList.toggle('hidden', tab !== 'tpn');
@@ -1024,6 +1188,7 @@
             const init = parseFloat(document.getElementById('en-init-rate').value) || 0;
             const adv = parseFloat(document.getElementById('en-advance').value) || 0;
             const goal = parseFloat(document.getElementById('en-goal').value) || 0;
+            const feedOptVal = document.getElementById('en-option').value || "-";
             
             const freq = 24 / h;
             document.getElementById('res-en-start').innerText = ((init * w) / freq).toFixed(1);
@@ -1031,43 +1196,37 @@
             document.getElementById('res-en-max').innerText = ((goal * w) / freq).toFixed(1);
             document.getElementById('res-en-interval').innerText = h;
             document.getElementById('res-en-interval-2').innerText = h;
-            document.getElementById('res-en-final-option').innerText = document.getElementById('en-option').value;
+            document.getElementById('res-en-final-option').innerText = feedOptVal;
             document.getElementById('res-en-fort-text').innerText = document.getElementById('en-fort-instructions').value || "None";
+
+            calculateCalorieBased();
         }
 
         function calculateTPN() {
-            const rawW = parseFloat(document.getElementById('tpn-weight').value) || 0;
-            const wUnit = document.getElementById('tpn-weight-unit').value;
-            const w = wUnit === 'g' ? rawW / 1000 : rawW;
-
-            const targetFluidKg = parseFloat(document.getElementById('tpn-fluid-kg').value) || 0;
-            const totalFluid = targetFluidKg * w;
-            document.getElementById('res-tpn-total-fluid-calc').innerText = totalFluid.toFixed(1);
-
+            const wStr = document.getElementById('tpn-weight').value;
+            const w = parseFloat(wStr) || 0;
+            const fluidTarget = (parseFloat(document.getElementById('tpn-fluid-kg').value) || 0) * w;
             const entFluid = parseFloat(document.getElementById('tpn-enteral-fluid').value) || 0;
-            const medFluid = parseFloat(document.getElementById('tpn-other-input').value) || 0;
-            const tpnFluid = totalFluid - entFluid - medFluid;
+            const otherFluid = parseFloat(document.getElementById('tpn-other-input').value) || 0;
+            const tpnFluid = fluidTarget - entFluid - otherFluid;
             document.getElementById('res-tpn-remain-fluid').innerText = tpnFluid.toFixed(1);
-
-            const targetEnergyKg = parseFloat(document.getElementById('tpn-target-energy-kg').value) || 0;
-            const totalEnergy = targetEnergyKg * w;
-            document.getElementById('res-tpn-total-energy-calc').innerText = totalEnergy.toFixed(1);
 
             const caloricDensity = parseFloat(document.getElementById('tpn-caloric-density').value) || 0;
             const enteralEnergyTotal = entFluid * caloricDensity;
             document.getElementById('res-enteral-energy').innerText = enteralEnergyTotal.toFixed(1) + " kcal";
-            
-            const remainingEnergy = Math.max(0, totalEnergy - enteralEnergyTotal);
-            document.getElementById('res-tpn-energy-need').innerText = remainingEnergy.toFixed(1) + " kcal";
+            const targetEnergyKg = parseFloat(document.getElementById('tpn-target-energy-kg').value) || 0;
+            document.getElementById('res-tpn-energy-need').innerText = Math.max(0, targetEnergyKg - (w > 0 ? enteralEnergyTotal/w : 0)).toFixed(1) + " kcal/kg";
 
             const pG = (parseFloat(document.getElementById('in-prot').value) || 0) * w;
-            const pV = pG / (parseFloat(document.getElementById('sel-prot-conc').value) / 100);
+            const pConc = parseFloat(document.getElementById('in-prot-conc').value) || 0;
+            const pV = pConc > 0 ? (pG / (pConc / 100)) : 0;
             document.getElementById('res-prot-total').innerText = pG.toFixed(1);
             document.getElementById('res-prot-vol').innerText = pV.toFixed(1);
             document.getElementById('res-prot-kcal').innerText = (pG * 4).toFixed(0);
 
             const lG = (parseFloat(document.getElementById('in-lipid').value) || 0) * w;
-            const lV = lG / (parseFloat(document.getElementById('sel-lipid-conc').value) / 100);
+            const lConc = parseFloat(document.getElementById('in-lipid-conc').value) || 0;
+            const lV = lConc > 0 ? (lG / (lConc / 100)) : 0;
             document.getElementById('res-lipid-total').innerText = lG.toFixed(1);
             document.getElementById('res-lipid-vol').innerText = lV.toFixed(1);
             document.getElementById('res-lipid-kcal').innerText = (lG * 10).toFixed(0);
@@ -1092,7 +1251,7 @@
             document.getElementById('res-ca-vol').innerText = caVol.toFixed(1);
 
             const mgTotal = (parseFloat(document.getElementById('in-mg').value) || 0) * w;
-            const mgVol = mgTotal / 0.812;
+            const mgVol = mgTotal / 0.41;
             document.getElementById('res-mg-total').innerText = mgTotal.toFixed(1);
             document.getElementById('res-mg-vol').innerText = mgVol.toFixed(1);
 
@@ -1103,23 +1262,48 @@
             const vitaVol = parseFloat(document.getElementById('in-vitalipid-vol').value) || 0;
             const soluVol = parseFloat(document.getElementById('in-soluvito-vol').value) || 0;
 
-            const gir = parseFloat(document.getElementById('in-gir').value) || 0;
-            const totalG_gram = (gir * w * 1440) / 1000;
-            const otherG_gram = (parseFloat(document.getElementById('in-glu-other-rate').value) || 0) * (parseFloat(document.getElementById('in-glu-other-dur').value) || 0) * (parseFloat(document.getElementById('in-glu-other-conc').value) || 0) / 100;
-            const tpnG_gram = totalG_gram - otherG_gram;
-            const tpnG_vol = tpnFluid - (pV + lV + naVol + kVol + caVol + mgVol + phosTotal + traceVol + vitaVol + soluVol);
-            
-            document.getElementById('res-glu-total-final').innerText = totalG_gram.toFixed(1);
+            const isAutoGlucose = document.getElementById('glu-toggle-auto').checked;
+            const intakeCell = document.getElementById('res-glu-intake-cell');
+
+            let tpnG_vol = 0;
+            let gluConc = 0;
+            let totalG_gram = 0;
+            let tpnG_gram = 0;
+
+            if (isAutoGlucose) {
+                intakeCell.innerText = "Auto (GIR)";
+                const gir = parseFloat(document.getElementById('in-gir').value) || 0;
+                totalG_gram = (gir * w * 1440) / 1000;
+                const otherG_gram = (parseFloat(document.getElementById('in-glu-other-rate').value) || 0) * (parseFloat(document.getElementById('in-glu-other-dur').value) || 0) * (parseFloat(document.getElementById('in-glu-other-conc').value) || 0) / 100;
+                tpnG_gram = totalG_gram - otherG_gram;
+
+                tpnG_vol = tpnFluid - (pV + lV + naVol + kVol + caVol + mgVol + phosTotal + traceVol + vitaVol + soluVol);
+                gluConc = tpnG_vol > 0 ? ((tpnG_gram / tpnG_vol) * 100) : 0;
+                document.getElementById('res-glu-conc-display').innerText = isFinite(gluConc) ? gluConc.toFixed(1) + "%" : "0%";
+            } else {
+                gluConc = parseFloat(document.getElementById('in-glu-conc-manual').value) || 0;
+                tpnG_vol = tpnFluid - (pV + lV + naVol + kVol + caVol + mgVol + phosTotal + traceVol + vitaVol + soluVol);
+                
+                // When toggle is OFF, Glucose Volume is tpnG_vol and Glucose concentration is gluConc
+                // Equation: Gir = (glucose volume * concentration) / (wt * 144)
+                const calcGir = (w > 0) ? ((tpnG_vol * gluConc) / (w * 144)) : 0;
+                intakeCell.innerText = isFinite(calcGir) ? calcGir.toFixed(2) + " (GIR)" : "0 (GIR)";
+
+                tpnG_gram = tpnG_vol * (gluConc / 100);
+                const otherG_gram = (parseFloat(document.getElementById('in-glu-other-rate').value) || 0) * (parseFloat(document.getElementById('in-glu-other-dur').value) || 0) * (parseFloat(document.getElementById('in-glu-other-conc').value) || 0) / 100;
+                totalG_gram = tpnG_gram + otherG_gram;
+            }
+
+            document.getElementById('res-glu-total-final').innerText = totalG_gram.toFixed(1) + " g";
             document.getElementById('res-glu-total-tpn').innerText = tpnG_gram.toFixed(1);
             document.getElementById('res-glu-vol-tpn').innerText = tpnG_vol.toFixed(1);
             document.getElementById('res-glu-kcal-tpn').innerText = (tpnG_gram * 3.4).toFixed(0);
 
-            const gluConc = (tpnG_gram / tpnG_vol) * 100;
             document.getElementById('res-glu-conc').innerText = isFinite(gluConc) ? gluConc.toFixed(1) + "%" : "0%";
 
-            const tpnKcalTable = (pG * 4) + (lG * 10) + (tpnG_gram * 3.4);
+            const tpnEnergy = (pG * 4) + (lG * 10) + (tpnG_gram * 3.4);
             document.getElementById('res-tpn-total-vol').innerText = tpnFluid.toFixed(1);
-            document.getElementById('res-tpn-total-kcal-table').innerText = tpnKcalTable.toFixed(0);
+            document.getElementById('res-tpn-total-kcal').innerText = tpnEnergy.toFixed(0);
 
             const infusionHours = parseFloat(document.getElementById('tpn-infusion-hours').value) || 24;
             const tpnRate = tpnFluid / infusionHours;
@@ -1131,7 +1315,7 @@
         }
 
         function smartPrint() {
-            const hasEN = (parseFloat(document.getElementById('en-weight').value) || 0) > 0;
+            const hasEN = (parseFloat(document.getElementById('en-weight').value) || 0) > 0 || (parseFloat(document.getElementById('cb-weight').value) || 0) > 0;
             const hasTPN = (parseFloat(document.getElementById('tpn-weight').value) || 0) > 0;
             if (!hasEN && !hasTPN) return;
             document.body.classList.remove('print-en', 'print-tpn');
@@ -1152,12 +1336,10 @@
             const ph = document.getElementById('pharmacist-name').value || "N/A";
 
             const w_en = parseFloat(document.getElementById('en-weight').value) || 0;
+            const w_cb = parseFloat(document.getElementById('cb-weight').value) || 0;
+            const w_tpn = parseFloat(document.getElementById('tpn-weight').value) || 0;
             
-            const rawW_tpn = parseFloat(document.getElementById('tpn-weight').value) || 0;
-            const wUnit_tpn = document.getElementById('tpn-weight-unit').value;
-            const w_tpn = wUnit_tpn === 'g' ? rawW_tpn / 1000 : rawW_tpn;
-            
-            if (w_en <= 0 && w_tpn <= 0) return;
+            if (w_en <= 0 && w_cb <= 0 && w_tpn <= 0) return;
 
             let text = `🏥 NICU Nutrition Report\n`;
             text += `👤 Patient: ${name}\n`;
@@ -1167,7 +1349,10 @@
             text += `🍎 Nutrition Diag: ${nDiag}\n\n`;
             
             if (w_en > 0) {
-                text += `🟣 ENTERAL\n• Weight: ${w_en} kg\n• Start: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n\n`;
+                text += `🟣 ENTERAL (Volume-based)\n• Weight: ${w_en} kg\n• Feed Option: ${document.getElementById('en-option').value || "N/A"}\n• Start: ${document.getElementById('res-en-start').innerText} ml every ${document.getElementById('res-en-interval').innerText}h\n\n`;
+            }
+            if (w_cb > 0) {
+                text += `🟣 ENTERAL (Calories-based)\n• Weight: ${w_cb} kg\n• Start: ${document.getElementById('cb-res-summary-start').innerText} ml every ${document.getElementById('cb-res-summary-freq1').innerText}h\n• Goal: ${document.getElementById('cb-res-summary-goal').innerText} ml every ${document.getElementById('cb-res-summary-freq2').innerText}h\n\n`;
             }
             if (w_tpn > 0) {
                 text += `🔵 TPN\n• Weight: ${w_tpn} kg\n• GIR: ${document.getElementById('in-gir').value}\n• TPN Rate: ${document.getElementById('res-tpn-rate').innerText}\n\n`;
@@ -1203,10 +1388,10 @@
         window.onload = () => {
             document.getElementById('report-date').value = new Date().toISOString().split('T')[0];
             switchTab('en');
+            calculateCalorieBased();
         }
     </script>
 </body>
 </html>
 
 
-```
