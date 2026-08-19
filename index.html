@@ -729,10 +729,20 @@
                                     <td id="res-tpn-total-kcal">0</td>
                                 </tr>
                                 <tr class="bg-blue-100 text-blue-900">
-                                    <td colspan="3">Infusion Duration (Hours)</td>
+                                    <td colspan="2">TPN Type</td>
+                                    <td>
+                                        <select id="tpn-type-select" onchange="toggleTpnTypeMode(); calculateTPN()" class="bg-white border-blue-300 font-bold text-xs">
+                                            <option value="3in1">3 in 1</option>
+                                            <option value="2in1">2 in 1</option>
+                                        </select>
+                                    </td>
+                                    <td colspan="2">Infusion Duration (Hours)</td>
                                     <td><input type="number" id="tpn-infusion-hours" value="24" oninput="calculateTPN()" class="bg-white border-blue-300 font-bold"></td>
-                                    <td class="text-sm">TPN Rate:</td>
-                                    <td id="res-tpn-rate" class="text-lg">0 ml/hr</td>
+                                </tr>
+                                <!-- Dynamic Rate Display Footer Row -->
+                                <tr id="tpn-rate-display-row" class="bg-blue-200 text-blue-950">
+                                    <td colspan="3" class="text-sm">TPN Rate:</td>
+                                    <td colspan="3" id="res-tpn-rate" class="text-lg">0 ml/hr</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -790,10 +800,11 @@
             <div id="section-ref" class="hidden space-y-6">
                 <h2 class="text-2xl font-bold text-emerald-800 border-r-4 border-emerald-600 pr-3">Information & Reference</h2>
                 
-                <!-- Sub-tabs for Reference (EN vs PN) -->
+                <!-- Sub-tabs for Reference (EN vs PN vs Quick Calculator) -->
                 <div class="flex bg-gray-100 p-2 rounded-lg gap-2 no-print">
                     <button onclick="switchSubTab('enteral')" id="sub-tab-enteral" class="sub-tab-btn active flex-1">Enteral (EN)</button>
                     <button onclick="switchSubTab('parenteral')" id="sub-tab-parenteral" class="sub-tab-btn flex-1">Parenteral (PN)</button>
+                    <button onclick="switchSubTab('quick-calc')" id="sub-tab-quick-calc" class="sub-tab-btn flex-1">Quick Calculator</button>
                 </div>
 
                 <!-- ENTERAL REFERENCE CONTENT -->
@@ -916,8 +927,20 @@
                                 <tr><td>Preterm</td><td>90 - 120</td></tr>
                                 <tr><td>0 - 1 year</td><td>75 - 85</td></tr>
                                 <tr><td>1 - 7 year</td><td>65 - 75</td></tr>
+                                <tr><td>7 - 12 year</td><td>55 - 65</td></tr>
+                                <tr><td>12 - 18 year</td><td>30 - 55</td></tr>
                             </tbody>
                         </table>
+                        <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded text-sm ltr-block">
+                            <strong class="text-blue-900 block mb-1">Note:</strong>
+                            <p class="mb-2">During the first week, energy and macronutrient delivery should be advanced gradually to allow metabolic adaptation.</p>
+                            <p class="font-bold">In critical illness, requirements vary by metabolic phase:</p>
+                            <ul class="list-disc pl-5 mt-1 space-y-1">
+                                <li>Early acute: 50–60% of target</li>
+                                <li>Stable: 60–80% of target</li>
+                                <li>Recovery: 80–100% of target</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div id="pn-nested-fluid" class="pn-nested-content hidden">
@@ -925,8 +948,12 @@
                         <table class="ref-table">
                             <thead><tr><th>Age</th><th>Fluid (ml / kg)</th></tr></thead>
                             <tbody>
-                                <tr><td>Neonate</td><td>140 - 180</td></tr>
-                                <tr><td>0 - 1 year</td><td>120 - 150</td></tr>
+                                <tr><td>Neonate (term or preterm)</td><td>140 - 180</td></tr>
+                                <tr><td>0 - 1 year (after first month)</td><td>120 - 150</td></tr>
+                                <tr><td>1 - 2 year</td><td>80 - 120</td></tr>
+                                <tr><td>2 - 7 year</td><td>80 - 100</td></tr>
+                                <tr><td>7 - 12 year</td><td>60 - 80</td></tr>
+                                <tr><td>12 - 18 year</td><td>50 - 70</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -936,8 +963,9 @@
                         <table class="ref-table">
                             <thead><tr><th>Age</th><th>Goal GIR (mg / kg / min)</th></tr></thead>
                             <tbody>
-                                <tr><td>&lt; 1 year</td><td>10 - 14</td></tr>
+                                <tr><td>&lt; 1 year</td><td>10 - 12</td></tr>
                                 <tr><td>1 - 10 year</td><td>8 - 10</td></tr>
+                                <tr><td>10 - 18 year</td><td>5 - 6</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -949,6 +977,8 @@
                             <tbody>
                                 <tr><td>Preterm neonate</td><td>3 - 4</td></tr>
                                 <tr><td>Birth to age 1 y</td><td>2 - 3</td></tr>
+                                <tr><td>Weight &gt; 10 kg or ages 1-10 y</td><td>1 - 2</td></tr>
+                                <tr><td>Ages 11-17 y</td><td>0.8 - 1.5</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -956,32 +986,213 @@
                     <div id="pn-nested-fat" class="pn-nested-content hidden">
                         <span class="ref-section-title">Fat Requirement</span>
                         <table class="ref-table">
-                            <thead><tr><th>Age</th><th>Goal (gram / kg / day)</th></tr></thead>
+                            <thead><tr><th>Age</th><th>Goal (gram / kg / day)</th><th>Advancement Notes</th></tr></thead>
                             <tbody>
-                                <tr><td>&lt; 1 year</td><td>3 - 4</td></tr>
+                                <tr><td>&lt; 1 year</td><td>3 - 4</td><td>Start at 0.5-1 and increase gradually by 0.5-1 daily.</td></tr>
+                                <tr><td>1 - 10 year</td><td>2 - 3</td><td>Start at 1-2 and increase gradually by 0.5-1 daily.</td></tr>
+                                <tr><td>10 - 18 year</td><td>1 - 2</td><td>Start at 1 and increase gradually by 1 daily.</td></tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div id="pn-nested-electrolytes" class="pn-nested-content hidden">
                         <span class="ref-section-title">Electrolyte Requirement</span>
-                        <table class="ref-table">
-                            <thead><tr><th>Electrolyte</th><th>Na (mEq/kg/d)</th><th>K (mmol/kg/d)</th></tr></thead>
+                        <table class="ref-table mb-4">
+                            <thead><tr><th>Electrolyte</th><th>Na (mEq/kg/day)</th><th>K (mEq/kg/day)</th><th>Acetate</th><th>Chloride</th></tr></thead>
                             <tbody>
-                                <tr><td>3rd day - 18 year</td><td>2 - 4</td><td>2 - 4</td></tr>
+                                <tr><td>0 - 2 day</td><td>0 - 2</td><td>0 - 2</td><td>as needed to maintain acid-base balance</td><td>as needed to maintain acid-base balance</td></tr>
+                                <tr><td>3rd day - 18 year</td><td>2 - 4</td><td>2 - 4</td><td>as needed to maintain acid-base balance</td><td>as needed to maintain acid-base balance</td></tr>
+                                <tr><td>Child &gt; 50 kg</td><td>1 - 2</td><td>1 - 2</td><td>as needed to maintain acid-base balance</td><td>as needed to maintain acid-base balance</td></tr>
+                            </tbody>
+                        </table>
+                        
+                        <table class="ref-table">
+                            <thead><tr><th>Electrolyte</th><th>Magnesium (mEq/kg/day)</th><th>Calcium (mmol/kg/day)</th><th>Phosphorus (mmol/kg/day)</th></tr></thead>
+                            <tbody>
+                                <tr><td>Preterm 0 - 2 day</td><td>0.2</td><td>1 - 2</td><td>1 - 2</td></tr>
+                                <tr><td>Preterm (growing phase)</td><td>0.4</td><td>1.5 - 3.5</td><td>1.5 - 3.5</td></tr>
+                                <tr><td>Term 0 - 18 year</td><td>0.2</td><td>0-6 month: 1<br>6m-1y: 0.5<br>1-18y: 0.25</td><td>0-6 month: 1<br>6m-1y: 0.5<br>1-18y: 0.25</td></tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div id="pn-nested-vitamins" class="pn-nested-content hidden">
-                        <span class="ref-section-title">Vitamins & Trace Elements</span>
-                        <table class="ref-table">
-                            <thead><tr><th>Type</th><th>Dose</th></tr></thead>
+                        <span class="ref-section-title">Vitamins Requirement</span>
+                        
+                        <h4 class="font-bold text-sm text-gray-700 mt-2 mb-1">Fat Soluble Vitamins</h4>
+                        <table class="ref-table mb-4">
+                            <thead><tr><th>Age</th><th>Fat soluble (Vitalipid N Infant)</th><th>Fat soluble (Vitalipid N Adult)</th></tr></thead>
                             <tbody>
-                                <tr><td>Peditrace</td><td>1 ml / kg (up to 15 ml/day)</td></tr>
-                                <tr><td>Vitalipid N Infant</td><td>4 ml / kg / day (&lt; 2.5kg)</td></tr>
+                                <tr><td>Infant &amp; children &lt; 11 years</td><td>1 ml / kg / day , Maximum dose : 10ml / day.</td><td>---------</td></tr>
+                                <tr><td>Children &gt; 11 years &amp; Adult</td><td>------------</td><td>1 ampoule (10 ml) / day</td></tr>
                             </tbody>
                         </table>
+
+                        <h4 class="font-bold text-sm text-gray-700 mb-1">Water Soluble Vitamins (Soluvit N)</h4>
+                        <table class="ref-table mb-4">
+                            <thead><tr><th>Age / Weight</th><th>Dose</th></tr></thead>
+                            <tbody>
+                                <tr><td>Infants and children &lt; 10 kg</td><td>(0.1 vial &times; weight ) / day</td></tr>
+                                <tr><td>Adults and children &ge; 10 kg</td><td>1 vial / day</td></tr>
+                            </tbody>
+                        </table>
+
+                        <span class="ref-section-title">Trace Elements Requirement</span>
+                        <table class="ref-table">
+                            <thead><tr><th>Weight</th><th>Dose</th></tr></thead>
+                            <tbody>
+                                <tr><td>&lt; 40 kg</td><td>Peditrace amp: 1 ml / kg (up to max 15 ml/day)</td></tr>
+                                <tr><td>&ge; 40 kg</td><td>Addaven amp: 10 ml / day</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- QUICK CALCULATOR CONTENT -->
+                <div id="sub-content-quick-calc" class="hidden p-6 bg-white border rounded-xl shadow-sm min-h-[400px] ltr-block space-y-6">
+                    <h3 class="font-bold text-xl text-emerald-900 border-b pb-2 mb-4">Quick Calculator</h3>
+                    
+                    <!-- Collapsible Dropdown 1: GIR Calculator -->
+                    <div class="border border-emerald-200 rounded-xl overflow-hidden shadow-sm">
+                        <button onclick="toggleQuickAccordion('qc-gir-content', 'qc-gir-arrow')" class="w-full bg-emerald-50 p-4 text-emerald-900 font-bold flex justify-between items-center text-md hover:bg-emerald-100 transition-colors">
+                            <span>GIR Calculator</span>
+                            <svg id="qc-gir-arrow" class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <div id="qc-gir-content" class="hidden p-4 md:p-6 space-y-6 bg-white">
+                            <!-- 1. Weight -->
+                            <div class="bg-gray-50 p-4 rounded-xl border">
+                                <label class="block text-sm font-bold mb-1 text-gray-700">1. Weight (kg)</label>
+                                <input type="number" id="qc-weight" value="2" step="0.1" class="bg-white ltr-input" oninput="calculateQuickGIR()">
+                            </div>
+
+                            <!-- 2. IV Fluids -->
+                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-bold text-blue-900">2. Intravenous fluids (IV)</h4>
+                                    <button onclick="addIVLine()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded font-bold shadow transition-all">+ Add IV Line</button>
+                                </div>
+                                
+                                <div id="iv-lines-container" class="space-y-3">
+                                    <div class="iv-line-row grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
+                                        <div class="md:col-span-3">
+                                            <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose conc%</label>
+                                            <input type="number" id="qc-iv-conc-0" value="10" step="0.1" class="bg-white" oninput="calculateQuickGIR()">
+                                        </div>
+                                        <div class="md:col-span-3">
+                                            <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose Rate Unit</label>
+                                            <select id="qc-iv-unit-0" class="bg-white" onchange="calculateQuickGIR()">
+                                                <option value="h">ml / h</option>
+                                                <option value="d">ml / d</option>
+                                            </select>
+                                        </div>
+                                        <div class="md:col-span-5">
+                                            <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose Rate Value</label>
+                                            <input type="number" id="qc-iv-rate-0" value="10" step="0.1" class="bg-white" oninput="calculateQuickGIR()">
+                                        </div>
+                                        <div class="md:col-span-1 flex items-end justify-center"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Enteral Intake -->
+                            <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 space-y-3">
+                                <h4 class="font-bold text-purple-900">3. Enteral Intake</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold mb-1 text-gray-700">Milk type</label>
+                                        <select id="qc-milk-type" class="bg-white" onchange="calculateQuickGIR()">
+                                            <option value="breast">Breast milk (7.1 g%)</option>
+                                            <option value="term">Term formula (7.1 g%)</option>
+                                            <option value="preterm">Preterm formula (8.5 g%)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold mb-1 text-gray-700">Volume (ml / feed)</label>
+                                        <input type="number" id="qc-ent-vol" value="20" step="0.1" class="bg-white" oninput="calculateQuickGIR()">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                    <div>
+                                        <label class="block text-xs font-bold mb-1 text-gray-700">Frequency (Every × h)</label>
+                                        <input type="number" id="qc-ent-freq" value="3" step="1" class="bg-white" oninput="calculateQuickGIR()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold mb-1 text-gray-700">Daily Added carb (g)</label>
+                                        <input type="number" id="qc-ent-carb" value="0" step="0.1" class="bg-white" oninput="calculateQuickGIR()">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Results Box -->
+                            <div class="highlight-box bg-emerald-50 border-emerald-500 text-center space-y-2">
+                                <h4 class="font-bold text-emerald-900 text-lg">Total Glucose Infusion Rate</h4>
+                                <div class="text-3xl font-extrabold text-emerald-700" id="qc-res-total-gir">0.00 <span class="text-sm font-normal">mg/kg/min</span></div>
+                                <div class="text-xs text-gray-600 flex justify-center gap-6 pt-2 border-t border-emerald-200">
+                                    <span>IV GIR: <strong id="qc-res-iv-gir">0.00</strong></span>
+                                    <span>Enteral GIR: <strong id="qc-res-ent-gir">0.00</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Dropdown 2: Dextrose Preparation Calculator -->
+                    <div class="border border-blue-200 rounded-xl overflow-hidden shadow-sm">
+                        <button onclick="toggleQuickAccordion('qc-dextrose-content', 'qc-dextrose-arrow')" class="w-full bg-blue-50 p-4 text-blue-900 font-bold flex justify-between items-center text-md hover:bg-blue-100 transition-colors">
+                            <span>Dextrose Preparation Calculator</span>
+                            <svg id="qc-dextrose-arrow" class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <div id="qc-dextrose-content" class="hidden p-4 md:p-6 space-y-6 bg-white">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Calculation Basis</label>
+                                    <select id="dex-mode" class="bg-white font-bold text-blue-900" onchange="toggleDexMode(); calculateDextrosePrep()">
+                                        <option value="conc">Required Dextrose Conc %</option>
+                                        <option value="gir">Target GIR (mg/kg/min)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Glucose Volume (mL)</label>
+                                    <input type="number" id="dex-volume" value="100" step="1" class="bg-white" oninput="calculateDextrosePrep()">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div id="dex-input-conc-container">
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Required Dextrose Conc (%)</label>
+                                    <input type="number" id="dex-req-conc" value="12.5" step="0.1" class="bg-white" oninput="calculateDextrosePrep()">
+                                </div>
+                                <div id="dex-input-weight-container" class="hidden">
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Weight (kg)</label>
+                                    <input type="number" id="dex-weight" value="2" step="0.1" class="bg-white" oninput="calculateDextrosePrep()">
+                                </div>
+                                <div id="dex-input-gir-container" class="hidden">
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Target GIR (mg/kg/min)</label>
+                                    <input type="number" id="dex-target-gir" value="6" step="0.1" class="bg-white" oninput="calculateDextrosePrep()">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Dextrose Concentration C₁ (%)</label>
+                                    <input type="number" id="dex-c1" value="25" step="0.1" class="bg-white" oninput="calculateDextrosePrep()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1 text-gray-700">Dextrose Concentration C₂ (%)</label>
+                                    <input type="number" id="dex-c2" value="5" step="0.1" class="bg-white" oninput="calculateDextrosePrep()">
+                                </div>
+                            </div>
+
+                            <div class="highlight-box bg-blue-50 border-blue-400 text-center space-y-2">
+                                <h4 class="font-bold text-blue-900 text-md">Preparation Result</h4>
+                                <div class="text-lg font-bold text-blue-800" id="dex-res-text">Enter parameters to calculate</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1028,6 +1239,60 @@
     </div>
 
     <script>
+        let ivLineCount = 1;
+
+        function addIVLine() {
+            const container = document.getElementById('iv-lines-container');
+            const index = ivLineCount++;
+            
+            const row = document.createElement('div');
+            row.className = 'iv-line-row grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-white p-3 rounded-lg border border-blue-100 shadow-sm';
+            row.id = `iv-line-${index}`;
+            
+            row.innerHTML = `
+                <div class="md:col-span-3">
+                    <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose conc%</label>
+                    <input type="number" id="qc-iv-conc-${index}" value="10" step="0.1" class="bg-white" oninput="calculateQuickGIR()">
+                </div>
+                <div class="md:col-span-3">
+                    <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose Rate Unit</label>
+                    <select id="qc-iv-unit-${index}" class="bg-white" onchange="calculateQuickGIR()">
+                        <option value="h">ml / h</option>
+                        <option value="d">ml / d</option>
+                    </select>
+                </div>
+                <div class="md:col-span-5">
+                    <label class="block text-[10px] font-bold mb-1 text-gray-600">Glucose Rate Value</label>
+                    <input type="number" id="qc-iv-rate-${index}" value="0" step="0.1" class="bg-white" oninput="calculateQuickGIR()">
+                </div>
+                <div class="md:col-span-1 flex items-end justify-center">
+                    <button onclick="removeIVLine(${index})" class="bg-red-500 hover:bg-red-600 text-white font-bold px-2 py-1.5 rounded text-xs transition-all">✕</button>
+                </div>
+            `;
+            container.appendChild(row);
+            calculateQuickGIR();
+        }
+
+        function removeIVLine(index) {
+            const row = document.getElementById(`iv-line-${index}`);
+            if (row) {
+                row.remove();
+                calculateQuickGIR();
+            }
+        }
+
+        function toggleQuickAccordion(contentId, arrowId) {
+            const content = document.getElementById(contentId);
+            const arrow = document.getElementById(arrowId);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
         function toggleENAccordion(contentId, arrowId) {
             const content = document.getElementById(contentId);
             const arrow = document.getElementById(arrowId);
@@ -1055,6 +1320,53 @@
             calculateTPN();
         }
 
+        function toggleTpnTypeMode() {
+            const tpnType = document.getElementById('tpn-type-select').value;
+            const dynamicRow = document.getElementById('tpn-rate-display-row');
+            
+            if (tpnType === '2in1') {
+                dynamicRow.innerHTML = `
+                    <td colspan="6" class="p-3 bg-blue-100 text-blue-950">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-bold">
+                            <div class="flex flex-col gap-1 bg-white p-2 rounded border border-blue-300">
+                                <label>Lipid Infusion Duration (h):</label>
+                                <input type="number" id="tpn-lipid-hours" value="24" oninput="calculateTPN()" class="bg-gray-50 border text-center">
+                                <span id="res-lipid-rate" class="text-blue-700 text-sm mt-1">Lipid Rate: 0 ml/h</span>
+                            </div>
+                            <div class="flex flex-col gap-1 bg-white p-2 rounded border border-blue-300">
+                                <label>Aqueous Solution Duration (h):</label>
+                                <input type="number" id="tpn-aqueous-hours" value="24" oninput="calculateTPN()" class="bg-gray-50 border text-center">
+                                <span id="res-aqueous-rate" class="text-blue-700 text-sm mt-1">Aqueous Rate: 0 ml/h</span>
+                            </div>
+                        </div>
+                    </td>
+                `;
+            } else {
+                dynamicRow.innerHTML = `
+                    <td colspan="3" class="text-sm">TPN Rate:</td>
+                    <td colspan="3" id="res-tpn-rate" class="text-lg">0 ml/hr</td>
+                `;
+            }
+            calculateTPN();
+        }
+
+        function toggleDexMode() {
+            const mode = document.getElementById('dex-mode').value;
+            const concContainer = document.getElementById('dex-input-conc-container');
+            const weightContainer = document.getElementById('dex-input-weight-container');
+            const girContainer = document.getElementById('dex-input-gir-container');
+
+            if (mode === 'conc') {
+                concContainer.classList.remove('hidden');
+                weightContainer.classList.add('hidden');
+                girContainer.classList.add('hidden');
+            } else {
+                concContainer.classList.add('hidden');
+                weightContainer.classList.remove('hidden');
+                girContainer.classList.remove('hidden');
+            }
+        }
+
         function calculateCalorieBased() {
             const weight = parseFloat(document.getElementById('cb-weight').value) || 0;
             const kcalKg = parseFloat(document.getElementById('cb-kcal-kg').value) || 0;
@@ -1076,7 +1388,6 @@
             const feedingVolume = caloricDensity > 0 ? (totalCalories / caloricDensity) : 0;
             document.getElementById('cb-res-feeding-volume').innerText = feedingVolume.toFixed(2);
 
-            // Calculations for Gap
             const waterFromFormula = (freeWaterPct * 0.01) * feedingVolume;
             const waterGap = waterFromFormula - totalWater;
             document.getElementById('cb-res-water-gap').innerText = waterGap.toFixed(2);
@@ -1111,7 +1422,6 @@
                 proteinGapMsgEl.innerText = `provided protein meets exact requirement.`;
             }
 
-            // Feeding Rate & Summary
             const initPct = parseFloat(document.getElementById('cb-init-pct').value) || 0;
             const advancePct = parseFloat(document.getElementById('cb-advance-pct').value) || 0;
             const freqHours = parseFloat(document.getElementById('cb-freq-hours').value) || 1;
@@ -1153,8 +1463,11 @@
         function switchSubTab(sub) {
             document.getElementById('sub-content-enteral').classList.toggle('hidden', sub !== 'enteral');
             document.getElementById('sub-content-parenteral').classList.toggle('hidden', sub !== 'parenteral');
+            document.getElementById('sub-content-quick-calc').classList.toggle('hidden', sub !== 'quick-calc');
+            
             document.getElementById('sub-tab-enteral').classList.toggle('active', sub === 'enteral');
             document.getElementById('sub-tab-parenteral').classList.toggle('active', sub === 'parenteral');
+            document.getElementById('sub-tab-quick-calc').classList.toggle('active', sub === 'quick-calc');
         }
 
         function switchEnNested(id) {
@@ -1284,8 +1597,6 @@
                 gluConc = parseFloat(document.getElementById('in-glu-conc-manual').value) || 0;
                 tpnG_vol = tpnFluid - (pV + lV + naVol + kVol + caVol + mgVol + phosTotal + traceVol + vitaVol + soluVol);
                 
-                // When toggle is OFF, Glucose Volume is tpnG_vol and Glucose concentration is gluConc
-                // Equation: Gir = (glucose volume * concentration) / (wt * 144)
                 const calcGir = (w > 0) ? ((tpnG_vol * gluConc) / (w * 144)) : 0;
                 intakeCell.innerText = isFinite(calcGir) ? calcGir.toFixed(2) + " (GIR)" : "0 (GIR)";
 
@@ -1305,13 +1616,116 @@
             document.getElementById('res-tpn-total-vol').innerText = tpnFluid.toFixed(1);
             document.getElementById('res-tpn-total-kcal').innerText = tpnEnergy.toFixed(0);
 
+            const tpnType = document.getElementById('tpn-type-select').value;
             const infusionHours = parseFloat(document.getElementById('tpn-infusion-hours').value) || 24;
-            const tpnRate = tpnFluid / infusionHours;
-            document.getElementById('res-tpn-rate').innerText = isFinite(tpnRate) ? tpnRate.toFixed(1) + " ml/hr" : "0 ml/hr";
+
+            if (tpnType === '3in1') {
+                const tpnRate = tpnFluid / infusionHours;
+                const rateEl = document.getElementById('res-tpn-rate');
+                if (rateEl) {
+                    rateEl.innerText = isFinite(tpnRate) ? tpnRate.toFixed(1) + " ml/hr" : "0 ml/hr";
+                }
+            } else {
+                const lipidHours = parseFloat(document.getElementById('tpn-lipid-hours').value) || 24;
+                const aqueousHours = parseFloat(document.getElementById('tpn-aqueous-hours').value) || 24;
+
+                const lipidRate = lipidHours > 0 ? (lV / lipidHours) : 0;
+                const aqueousVolume = tpnFluid - lV;
+                const aqueousRate = aqueousHours > 0 ? (aqueousVolume / aqueousHours) : 0;
+
+                const lipidRateEl = document.getElementById('res-lipid-rate');
+                const aqueousRateEl = document.getElementById('res-aqueous-rate');
+
+                if (lipidRateEl) lipidRateEl.innerText = `Lipid Rate: ${isFinite(lipidRate) ? lipidRate.toFixed(1) : "0"} ml/h`;
+                if (aqueousRateEl) aqueousRateEl.innerText = `Aqueous Rate: ${isFinite(aqueousRate) ? aqueousRate.toFixed(1) : "0"} ml/h`;
+            }
 
             const osm = (pG * 10 + tpnG_gram * 5 + (naAdjusted + kTotal + caTotal + mgTotal) * 2) / (tpnFluid / 1000);
             document.getElementById('res-osmolarity').innerText = isFinite(osm) ? Math.round(osm) : "0";
             runMixing();
+        }
+
+        function calculateQuickGIR() {
+            const w = parseFloat(document.getElementById('qc-weight').value) || 0;
+            let totalIvGIR = 0;
+
+            const rows = document.querySelectorAll('.iv-line-row');
+            rows.forEach(row => {
+                const concInput = row.querySelector('input[id*="qc-iv-conc"]');
+                const unitSelect = row.querySelector('select[id*="qc-iv-unit"]');
+                const rateInput = row.querySelector('input[id*="qc-iv-rate"]');
+
+                if (concInput && unitSelect && rateInput) {
+                    const conc = parseFloat(concInput.value) || 0;
+                    const unit = unitSelect.value;
+                    const rate = parseFloat(rateInput.value) || 0;
+
+                    if (w > 0) {
+                        if (unit === 'h') {
+                            totalIvGIR += (rate * conc) / (w * 6);
+                        } else {
+                            totalIvGIR += (rate * conc) / (w * 144);
+                        }
+                    }
+                }
+            });
+
+            const milkType = document.getElementById('qc-milk-type').value;
+            const entVol = parseFloat(document.getElementById('qc-ent-vol').value) || 0;
+            const entFreq = parseFloat(document.getElementById('qc-ent-freq').value) || 1;
+            const addedCarb = parseFloat(document.getElementById('qc-ent-carb').value) || 0;
+
+            let baseCarb = 7.1;
+            if (milkType === 'preterm') {
+                baseCarb = 8.5;
+            }
+
+            let entGIR = 0;
+            if (w > 0 && entFreq > 0) {
+                entGIR = (((entVol * 24 / entFreq) * (baseCarb * 0.01)) + addedCarb) / (w * 1.44);
+            }
+
+            const totalGIR = totalIvGIR + entGIR;
+
+            document.getElementById('qc-res-iv-gir').innerText = totalIvGIR.toFixed(2);
+            document.getElementById('qc-res-ent-gir').innerText = entGIR.toFixed(2);
+            document.getElementById('qc-res-total-gir').innerHTML = `${totalGIR.toFixed(2)} <span class="text-sm font-normal">mg/kg/min</span>`;
+        }
+
+        function calculateDextrosePrep() {
+            const mode = document.getElementById('dex-mode').value;
+            const vt = parseFloat(document.getElementById('dex-volume').value) || 0;
+            const c1 = parseFloat(document.getElementById('dex-c1').value) || 0;
+            const c2 = parseFloat(document.getElementById('dex-c2').value) || 0;
+
+            let dPct = 0;
+            if (mode === 'conc') {
+                dPct = parseFloat(document.getElementById('dex-req-conc').value) || 0;
+            } else {
+                const weight = parseFloat(document.getElementById('dex-weight').value) || 0;
+                const targetGir = parseFloat(document.getElementById('dex-target-gir').value) || 0;
+                if (vt > 0) {
+                    dPct = (targetGir * weight * 1.44) / vt * 100;
+                }
+            }
+
+            if (c1 === c2 || c1 <= c2) {
+                document.getElementById('dex-res-text').innerText = "C₁ must be greater than C₂";
+                return;
+            }
+
+            const v1 = vt * (dPct - c2) / (c1 - c2);
+            const v2 = vt - v1;
+
+            if (v1 < 0 || v2 < 0) {
+                document.getElementById('dex-res-text').innerText = "Target concentration out of bounds for given concentrations";
+                return;
+            }
+
+            const nameC1 = `D${c1}%`;
+            const nameC2 = `D${c2}%`;
+
+            document.getElementById('dex-res-text').innerText = `Making ${vt} mL of glucose ${dPct.toFixed(1)}% → ${v1.toFixed(1)} mL ${nameC1} + ${v2.toFixed(1)} mL ${nameC2}`;
         }
 
         function smartPrint() {
@@ -1389,9 +1803,10 @@
             document.getElementById('report-date').value = new Date().toISOString().split('T')[0];
             switchTab('en');
             calculateCalorieBased();
+            calculateQuickGIR();
+            calculateDextrosePrep();
+            toggleDexMode();
         }
     </script>
 </body>
-</html>
-
-
+    </html>
